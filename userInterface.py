@@ -36,7 +36,7 @@ class userInterface:
     def convoBoxSetup(self):
         self.convoBox = tk.Text(bg=black, font=font, fg=white, cursor="arrow", state=tk.DISABLED, wrap=tk.WORD)
         self.convoBox.place(relheight=0.8, relwidth=0.95, relx=0.02, rely=0.05)
-        scrollbar = tk.Scrollbar(self.convoBox, command=self.convoBox.yview())
+        scrollbar = tk.Scrollbar(self.convoBox, command=self.convoBox.yview)
         scrollbar.place(relheight=1, relx=0.97)
 
     def onEnter(self, event):
