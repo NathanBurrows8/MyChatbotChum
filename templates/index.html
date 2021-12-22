@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="icon" type="image/x-icon" href="/static/robot_small.png">
+    <title>MyChatbotChum</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script type="text/javascript" src="{{ url_for('static', filename='javascript.js') }}"></script>
+  </head>
+  <body>
+<!-- Header to go here? Like a banner across the top saying you're talking to an Assistant? / like ios mesages? -->
+
+<!-- This is the conversation text box -->
+<div class="chatBox" id="chatBox">
+    <!-- Group for the avatar and robot's message -->
+    <div class="chatGroup robot">
+        <div class="avatar">
+            <figure>
+              <img src="/static/robot_small.png">
+            </figure>
+        </div>
+        <div class="actualText">
+            <div class="bubble">Yo im the robot</div>
+            <div class="time">12:22</div>
+        </div>
+    </div>
+    <!-- Group for the human's message -->
+    <div class="chatGroup human">
+        <div class="actualText">
+            <div class="bubble">Im the human, and this is a long text, so it breaks the line</div>
+            <div class="time">12:23</div>
+        </div>
+    </div>
+    <!-- Group for the avatar and robot's message -->
+    <div class="chatGroup robot">
+        <div class="avatar">
+            <figure>
+                <img src="/static/robot_small.png">
+            </figure>
+        </div>
+        <div class="actualText">
+            <div class="bubble">Okay fuck you</div>
+            <div class="time">12:24</div>
+        </div>
+    </div>
+</div>
+  </body>
+</html>
+

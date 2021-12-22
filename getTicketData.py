@@ -4,7 +4,7 @@ import json
 from bs4 import BeautifulSoup
 
 stationCodes = {}
-reader = csv.reader(open('assets/crs_codes.csv'))
+reader = csv.reader(open('static/crs_codes.csv'))
 for row in reader:
     key = row[0]
     stationCodes[key] = row[1]
@@ -18,6 +18,8 @@ websiteType = "dep"  # 'dep' = "depart after", 'arr' = "arrive before"
 
 website = "https://ojp.nationalrail.co.uk/service/timesandfares/" + websiteDeparture + "/" + websiteDestination + "/" \
           + websiteDate + "/" + websiteTime + "/" + websiteType
+        #need to add functionality for return tickets, and arrive before tickets <- not done yet, but easy
+        #also the user needs to be given the final web link to their ticket
 
 page = requests.get(website)
 # scraping all html
