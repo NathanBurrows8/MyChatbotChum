@@ -73,3 +73,18 @@ space between every text bubble */
   margin-right:5px;
 }
 
+.textBox {
+  max-width: 700px;
+}
+
+#textBoxInput {
+  width: 640px;
+  height: 30px;
+  margin-top: 11px;
+  font-size: 16px;
+}
+/*The send button should probably have just an icon instead of text saying 'send' it looks nicer */
+#sendButton {
+  height: 36px;
+
+}
