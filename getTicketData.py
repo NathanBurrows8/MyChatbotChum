@@ -10,7 +10,7 @@ for row in reader:
     stationCodes[key] = row[1]
 
 # change these 5 things for now to test the program
-websiteDeparture = stationCodes["Northampton"]
+websiteDeparture = stationCodes["Fleet"]
 websiteDestination = stationCodes["Norwich"]
 websiteDate = "271221"
 websiteTime = "1230"
@@ -36,6 +36,7 @@ dict1 = data['jsonJourneyBreakdown']
 dict2 = data['singleJsonFareBreakdowns'][0]
 cheapestPrice = (dict2['ticketPrice'])
 
+
 print("-----------------------------FOR " + websiteDate[0:2] + "/" + websiteDate[2:4] + "/" + websiteDate[4:6] +
       "----------------------------")
 print("The cheapest journey departs from " + str(dict1['departureStationName']) + " at " + str(dict1['departureTime']) +
@@ -44,3 +45,6 @@ print("The journey will take " + str(dict1['durationHours']) + " hours and " + s
       " minutes, and has " + str(dict1['changes']) + " changes.")
 print("The ticket will cost £" + f'{cheapestPrice:.2f}' + ".")
 print("(Journey provided by " + str(dict2['tocName']) + ")")
+
+#if a journey needs multiple tickets price needs to be added - this is fleet to norwich:
+#{"jsonJourneyBreakdown":{"departureStationName":"Fleet","departureStationCRS":"FLE","arrivalStationName":"Norwich","arrivalStationCRS":"NRW","statusMessage":null,"departureTime":"12:34","arrivalTime":"17:37","durationHours":5,"durationMinutes":3,"changes":6,"journeyId":1,"responseId":4,"statusIcon":"AMBER_TRIANGLE","hoverInformation":null},"singleJsonFareBreakdowns":[{"breakdownType":"SingleFare","fareTicketType":"Evening Out Single","ticketRestriction":"UL","fareRouteDescription":"Travel is allowed via any permitted route.","fareRouteName":"ANY PERMITTED","passengerType":"Adult","railcardName":"","ticketType":"Evening Out Single","ticketTypeCode":"EVA","fareSetter":"SWT","fareProvider":"South Western Railway","tocName":"South Western Railway","tocProvider":"South Western Railway","fareId":10078,"numberOfTickets":1,"fullFarePrice":6.0,"discount":0,"ticketPrice":6.0,"cheapestFirstClassFare":59.8,"nreFareCategory":"FLEXIBLE","redRoute":true},{"breakdownType":"SingleFare","fareTicketType":"Advance (Standard Class)","ticketRestriction":"OB","fareRouteDescription":"Only valid on booked Greater Anglia services and required connecting services.","fareRouteName":"AP GRTANG&CONCTS","passengerType":"Adult","railcardName":"","ticketType":"Advance (Standard Class)","ticketTypeCode":"OS4","fareSetter":"LER","fareProvider":"Greater Anglia","tocName":"Greater Anglia","tocProvider":"Greater Anglia","fareId":10089,"numberOfTickets":1,"fullFarePrice":37.5,"discount":0,"ticketPrice":37.5,"cheapestFirstClassFare":28.3,"nreFareCategory":"RESTRICTED","redRoute":true}],"returnJsonFareBreakdowns":[]}
