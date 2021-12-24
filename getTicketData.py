@@ -14,7 +14,7 @@ for row in reader:
 websiteDeparture = "Norwich"
 websiteDestination = "Swansea"
 websiteDate = "200122"
-websiteTime = "1100"
+websiteTime = "1100"    #no way to search website without a time? maybe just default to dep 10:00 or something
 websiteType = "first"  # 'dep' = "depart after", 'arr' = "arrive before", 'last', 'first'<-for "depart before"
 websiteReturnDate = "300122"
 websiteReturnTime = "1300"

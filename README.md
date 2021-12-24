@@ -16,6 +16,8 @@ DEPENDENCIES NEEDED:
 
 -experta
 
+-nltk
+
 INSTRUCTIONS FOR USE: (Windows)
 
 Type the following 3 commands into your console (in the folder the project is in):
