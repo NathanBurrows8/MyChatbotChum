@@ -53,7 +53,9 @@
   <div class="textAndButtonGroup">
     <input type="text" placeholder="Type your message here..." id="textBoxInput"
            onkeydown ="if (event.keyCode === 13) document.getElementById('sendButton').click()">
-    <button id="sendButton" onclick="onSendPressed()">Send</button>
+    <button id="sendButton" type="submit" onclick="onSendPressed()">
+        <img id="sendIcon" src="/static/send.png">
+    </button>
   </div>
 </div>
 

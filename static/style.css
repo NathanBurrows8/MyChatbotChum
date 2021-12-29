@@ -1,16 +1,19 @@
-
+/* denotes header css, margin:auto to center items, border-radius to round corners, and background colour */
 .header {
+  margin:auto;
   width: 700px;
   padding-top: 10px;
   text-align: center;
   height: 50px;
-  border-radius: 20px 20px 0px 0px;
+  border-radius: 20px 20px 0 0;
   background: rgb(195,34,110);
   background: linear-gradient(0deg, rgba(195,34,110,1) 0%, rgba(253,45,67,1) 100%);
 }
+
+/* just concerns the white text saying "National Rail Assistant" */
 .headerText {
   color: white;
-  font-family: Helvetica;
+  font-family: Helvetica, serif;
   padding-top:5px;
   text-align: center;
   font-size: 28px;
@@ -18,11 +21,13 @@
 
 /* General specification for the chatBox area */
 .chatBox{
+  margin: auto;
   width: 700px;
-  font-family: Helvetica;
+  font-family: Helvetica, serif;
   overflow-y: scroll;
   height: 700px;
   max-height:700px;
+  background-color: white;
 }
 
 /* General css for text bubbles, this mainly concerns the robots bubbles as the humans are overridden later in the
@@ -91,18 +96,29 @@ space between every text bubble */
   margin-right:5px;
 }
 
-.textBox {
+/* horizontally grouping the text box and send button, aligning them to middle */
+.textAndButtonGroup  {
   max-width: 700px;
+  margin: auto;
 }
 
+/* this is just for the text box and its dimensions, and to vertically align with the button */
 #textBoxInput {
   width: 640px;
   height: 30px;
-  margin-top: 11px;
+  margin-top: 10px;
   font-size: 16px;
+  vertical-align:middle;
 }
-/*The send button should probably have just an icon instead of text saying 'send' it looks nicer */
-#sendButton {
-  height: 36px;
 
+/* this is just for the send button */
+#sendButton {
+  margin-top: 10px;
+  height: 36px;
+  vertical-align:middle;
+}
+
+/*this is the icon the send button is using */
+#sendIcon {
+  height: 30px;
 }
