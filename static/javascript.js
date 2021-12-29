@@ -1,3 +1,8 @@
+var script = document.createElement('script');
+script.src = 'https://code.jquery.com/jquery-3.4.1.min.js';
+script.type = 'text/javascript';
+document.getElementsByTagName('head')[0].appendChild(script);
+
 function addRobotMessage(text) {
     var chatGroup = document.createElement("div")
     chatGroup.className = "chatGroup robot"
@@ -78,10 +83,23 @@ window.onload = function () {
 
 function onSendPressed() {
     var textBoxInput = document.getElementById('textBoxInput')
+    $.ajax({
+                type: "POST",
+                url: "/post",
+                contentType: "application/json",
+                data: JSON.stringify({text: textBoxInput.value}),
+                dataType: "json",
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            });
     if (textBoxInput.value !== "") {
         addHumanMessage(textBoxInput.value)
         textBoxInput.value = ""
     }
 
-}
 
+}
