@@ -21,6 +21,9 @@ class RobotCrossStreet(KnowledgeEngine):
     def cautious(self, light):
         print("Be cautious because light is", light['colour'])
 
+def finalResponseText():
+    return "Its curry time"
+
 if __name__ == '__main__':
     engine = RobotCrossStreet()
     engine.reset()

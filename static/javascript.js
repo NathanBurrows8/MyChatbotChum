@@ -90,10 +90,12 @@ function onSendPressed() {
                 data: JSON.stringify({text: textBoxInput.value}),
                 dataType: "json",
                 success: function(response) {
-                    console.log(response);
+                    addRobotMessage(response['responseText']);
                 },
+                    //extremely bad practice
                 error: function(err) {
-                    console.log(err);
+                    addRobotMessage(err['responseText']);
+                    console.log(err)
                 }
             });
     if (textBoxInput.value !== "") {
