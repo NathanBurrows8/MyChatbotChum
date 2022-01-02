@@ -15,7 +15,11 @@
 
 <!-- This is the conversation text box -->
 <div class="header">
-    <div class="headerText"><b>National Rail Assistant</b></div>
+    <div class="headerText"><b>National Rail Assistant</b>
+    <button id="volumeButton" type="submit" onclick="volumeButtonClicked()">
+        <img id="volumeIcon" alt ="micIcon" src="/static/volume_off.png">
+    </button>
+</div>
 </div>
 <div class="chatBox" id="chatBox">
     <!-- THE BELOW IS COMMENTED OUT AND WAS ONLY USED FOR INITIAL TESTING, and for reference of how bubbles are made

@@ -3,8 +3,10 @@ script.src = 'https://code.jquery.com/jquery-3.4.1.min.js';
 script.type = 'text/javascript';
 document.getElementsByTagName('head')[0].appendChild(script);
 let micRunning = false;
+let volume = 0;
 
 function addRobotMessage(text) {
+    speech(text);
     const chatGroup = document.createElement("div");
     chatGroup.className = "chatGroup robot"
     const avatar = document.createElement("div");
@@ -24,7 +26,7 @@ function addRobotMessage(text) {
     actualText.appendChild(bubble)
     const time = document.createElement("div");
     time.className = "time"
-    time.innerHTML = "12:25" /* CHANGE THIS TO ACTUAL TIME */
+    time.innerHTML = getTime();
     actualText.appendChild(time)
     const chatBox = document.getElementById("chatBox");
     chatBox.appendChild(chatGroup)
@@ -43,7 +45,7 @@ function addHumanMessage(text) {
     actualText.appendChild(bubble)
     const time = document.createElement("div");
     time.className = "time"
-    time.innerHTML = "12:25" /* change this to actual time, use 24h */
+    time.innerHTML = getTime();
     actualText.appendChild(time)
     const chatBox = document.getElementById("chatBox");
     chatBox.appendChild(chatGroup)
@@ -91,6 +93,7 @@ function micAnalysis() {
         document.getElementById('micIcon').src = "/static/mic.png";
         document.getElementById('textBoxInput').style.width = '602px';
         micRunning = false;
+        document.getElementById('sendButton').focus();
     }
 
     recognition.onresult = (event) => {
@@ -117,6 +120,35 @@ function removeTextGlow() {
     const textBoxInput = document.getElementById('textBoxInput');
     if (textBoxInput.classList.contains('animate')) {
         textBoxInput.classList.remove('animate');
+    }
+
+}
+
+function speech(text) {
+    var synth = window.speechSynthesis;
+    var utter = new SpeechSynthesisUtterance(text);
+    utter.volume = volume;
+    synth.speak(utter);
+}
+
+function getTime() {
+    const date = new Date();
+    const hours = (date.getHours() < 10 ? '0' : '') + date.getHours();
+    const minutes = (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+
+
+    return hours + ":" + minutes;
+}
+
+function volumeButtonClicked() {
+    const volumeIcon = document.getElementById('volumeIcon');
+    if (volume === 0) {
+        volumeIcon.src = "/static/volume_on.png";
+        volume = 1;
+    }
+    else {
+        volumeIcon.src = "/static/volume_off.png";
+        volume = 0;
     }
 
 }

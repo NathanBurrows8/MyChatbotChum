@@ -44,3 +44,7 @@ used with Pixabay license (no attribution required)
 -mic icon
 https://www.seekpng.com/ipng/u2w7w7o0o0q8y3y3_recording-symbol-vector-iphone-microphone-icon/
 used with SeekPNG licence (no attribution required)
+
+-recording gif, volume icons
+created by Nathan Burrows
+

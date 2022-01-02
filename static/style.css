@@ -25,6 +25,8 @@ body {
   padding-top:5px;
   text-align: center;
   font-size: 28px;
+  margin-left: 200px;
+  vertical-align: middle;
 }
 
 /* General specification for the chatBox area */
@@ -58,7 +60,7 @@ CSS directly below */
   word-wrap: break-word;
   background: #147efb;
   color: #FFFFFF;
-  margin-right: 5px;
+  margin-right: 10px;
 }
 
 /* Makes sure the avatar is at the left of the robots text bubble */
@@ -101,7 +103,7 @@ space between every text bubble */
   display: block;
   width: 100%;
   text-align: right;
-  margin-right:5px;
+  margin-right:10px;
 }
 
 /* horizontally grouping the text box and send button, aligning them to middle */
@@ -164,4 +166,14 @@ space between every text bubble */
   height: 30px;
 }
 
+#volumeButton {
+  height: 36px;
+  background-color: transparent;
+  border: 0;
+  margin-left: 130px;
+  vertical-align: middle;
+}
 
+#volumeIcon {
+  height: 34px;
+}
