@@ -50,37 +50,6 @@ function addHumanMessage(text) {
 
 }
 
-window.onload = function () {
-    setTimeout(function () {
-        addRobotMessage("whats 9+10");
-    }, 1000)
-
-    setTimeout(function () {
-        addHumanMessage("21");
-    }, 2000)
-
-    setTimeout(function () {
-        addRobotMessage("ur train is fucking late");
-    }, 3000)
-
-    setTimeout(function () {
-        addHumanMessage("can i book another one");
-    }, 4000)
-
-
-    setTimeout(function () {
-        addRobotMessage("go fuck yourself");
-    }, 5000)
-
-    setTimeout(function () {
-        addHumanMessage("okay the scrolling works this can stop now");
-    }, 6000)
-
-    setTimeout(function () {
-        addHumanMessage("you love to see it");
-    }, 7000)
-};
-
 function onSendPressed() {
     var textBoxInput = document.getElementById('textBoxInput')
     $.ajax({
@@ -102,6 +71,4 @@ function onSendPressed() {
         addHumanMessage(textBoxInput.value)
         textBoxInput.value = ""
     }
-
-
 }
