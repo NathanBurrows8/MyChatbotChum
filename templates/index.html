@@ -9,6 +9,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='javascript.js') }}"></script>
   </head>
   <body>
+
 <!-- Header to go here? Like a banner across the top saying you're talking to an Assistant? / like ios mesages? -->
 
 <!-- This is the conversation text box -->
@@ -56,7 +57,7 @@
     <input type="text" placeholder="Type your message here..." id="textBoxInput"
            onkeydown ="if (event.keyCode === 13) document.getElementById('sendButton').click()">
     <button id="sendButton" type="submit" onclick="onSendPressed()">
-        <img id="sendIcon" src="/static/send.png">
+        <img id="sendIcon" alt ="sendIcon" src="/static/send.png">
     </button>
   </div>
 </div>

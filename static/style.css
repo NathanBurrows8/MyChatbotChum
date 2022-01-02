@@ -1,3 +1,11 @@
+body {
+  background-image: url('background.svg');
+  background-size: 300px 300px;
+  background-repeat: repeat;
+
+}
+
+
 /* denotes header css, margin:auto to center items, border-radius to round corners, and background colour */
 .header {
   margin:auto;
@@ -106,14 +114,12 @@ space between every text bubble */
 #textBoxInput {
   width: 640px;
   height: 30px;
-  margin-top: 10px;
   font-size: 16px;
   vertical-align:middle;
 }
 
 /* this is just for the send button */
 #sendButton {
-  margin-top: 10px;
   height: 36px;
   vertical-align:middle;
 }
