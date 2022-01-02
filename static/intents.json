@@ -1,0 +1,72 @@
+{
+    "hello": 
+    ["Hello there! What assistance do you need?", "Hi there! How can I help?", "Nice to see you! What can I do for you?", "Hello, can i help?", "Hi! Is there anything you would like my help with?"],
+  
+  
+    "thanks": 
+    ["Happy to help!", "Happy to be of assistance!", "Glad I could help!", "My pleasure!"],
+  
+  
+    "question_type_of_booking": 
+    ["What would you like me to do? I can either help you make a booking, or find potential delays.", "Would you like me to help find potential delays, or assist with a booking?"],
+  
+  
+    "unable_to_parse": 
+    ["I didn't quite understand that. Sorry!", "Oops, I don't quite understand.", "Apologies, but I didn't understand that."],
+  
+  
+    "question_ticket_type": 
+    ["Will this be a single, or a return ticket?"],
+  
+  
+    "question_departure_location": 
+    ["Where would you like to depart from?", "Where will you be departing from?"],
+  
+  
+    "question_arrival_location": 
+    ["Where would you like to travel to?", "Where will you be travelling to?"],
+  
+  
+    "question_departure_time": 
+    ["When do you want your departure time to be?"],
+  
+   
+    "question_return_time": 
+    ["And when do you want your returning departure time to be?"],
+  
+   
+    "question_departure_date": 
+    ["What date do you want to depart on?", "What date will you be leaving on?"],
+  
+   
+    "question_return_date": 
+    ["What date would you like to return on?", "Which date will you be coming back on?"],
+
+
+    "validation_invalid_date": 
+    ["Sorry! I don't quite understand that date. Can you repeat it in a DD/MM/YY format?"],
+  
+ 
+    "validation_past_date": 
+    ["Sorry, that date is in the past! Please request another date.", "I'm afraid that date is in the past, oops! Please specify another date."],
+  
+  
+    "validation_invalid_time": 
+    ["Oops! I didnt quite understand that time. Can you repeat it in a HH:MM format?"],
+  
+   
+    "validation_past_time":
+    ["Sorry, that time is in the past! Please request another time.", "I'm afraid that time is in the past, oops! Please specify another time."],
+  
+  
+    "error_no_tickets": 
+    ["My apologies, we could not find any results for this journey.", "Sorry, there are no tickets available for this journey"],
+  
+   
+    "after_ticket_sent": 
+    ["Do you want to book another ticket or see potential train delays?", "Now, do you want to book a different ticket or see potential train delays?"]
+  }
+
+
+
+

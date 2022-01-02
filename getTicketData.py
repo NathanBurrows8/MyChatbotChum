@@ -156,3 +156,9 @@ def printTicket(dict1, dict2, cheapestPrice, website):
 formWebsiteReturn(websiteDeparture, websiteDestination, websiteDate, websiteTime, websiteType, websiteReturnDate,
                   websiteReturnTime, websiteReturnType)
 #formWebsite(websiteDeparture, websiteDestination, websiteDate, websiteTime, websiteType)
+
+
+
+
+
+#needs validation! is time in past? etc

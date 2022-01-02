@@ -5,7 +5,6 @@ body {
 
 }
 
-
 /* denotes header css, margin:auto to center items, border-radius to round corners, and background colour */
 .header {
   margin:auto;
@@ -133,15 +132,12 @@ space between every text bubble */
         }
 }
 
-
-
 /* calls the text box animation */
 .animate {
   animation-name: buttonGlow;
   animation-iteration-count: infinite;
   animation-duration: 1300ms;
 }
-
 
 /* this is just for the mic button */
 #micButton {

@@ -2,16 +2,9 @@
 
 DEPENDENCIES NEEDED:
 
-    -bs4 
+Type the following into your console (in the MyChatbotChum folder):
 
-    -requests
-
-    -flask
-
-    -experta
-
-    -nltk
-
+    pip install -r requirements.txt --user
 
 INSTRUCTIONS FOR USE: (Windows)
 
