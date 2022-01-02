@@ -1,11 +1,5 @@
 # MyChatbotChum
 
-
-So far, there is a basic chatbot UI, and also a web-scraping system to get the cheapest train ticket.
-
-
-
-
 DEPENDENCIES NEEDED:
 
     -bs4 
@@ -17,6 +11,7 @@ DEPENDENCIES NEEDED:
     -experta
 
     -nltk
+
 
 INSTRUCTIONS FOR USE: (Windows)
 
@@ -46,3 +41,6 @@ used with CC licence (no attribution required)
 https://pixabay.com/vectors/robot-icon-flat-flat-design-2192617/
 used with Pixabay license (no attribution required)
 
+-mic icon
+https://www.seekpng.com/ipng/u2w7w7o0o0q8y3y3_recording-symbol-vector-iphone-microphone-icon/
+used with SeekPNG licence (no attribution required)

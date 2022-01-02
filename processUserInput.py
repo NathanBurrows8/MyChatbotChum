@@ -1,15 +1,13 @@
 import re
+import string
 import nltk
+
+frequency = {}
 
 def getUserInput(text):
     text = text.lower()
+    text = text.translate(str.maketrans('','', string.punctuation))
     print(text)
 
 
-
-
-
-
-
-#need to get user text from javascript/flask and send it to this python file
 #bag of words? stemming?

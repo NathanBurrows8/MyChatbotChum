@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link rel="icon" type="image/x-icon" href="/static/robot_small.png">
-    <title>MyChatbotChum</title>
+    <title>National Rail Chatbot</title>
     <link rel="stylesheet" href="/static/style.css">
     <script type="text/javascript" src="{{ url_for('static', filename='javascript.js') }}"></script>
   </head>
-  <body>
+
+  <body onload="micAnalysis()">
 
 <!-- Header to go here? Like a banner across the top saying you're talking to an Assistant? / like ios mesages? -->
 
@@ -54,8 +55,11 @@
 
 <div class="textBox">
   <div class="textAndButtonGroup">
-    <input type="text" placeholder="Type your message here..." id="textBoxInput"
+    <input type="text" placeholder="Type your message here..." id="textBoxInput" onclick="removeTextGlow()"
            onkeydown ="if (event.keyCode === 13) document.getElementById('sendButton').click()">
+      <button id="micButton" type="submit">
+        <img id="micIcon" alt ="micIcon" src="/static/mic.png">
+    </button>
     <button id="sendButton" type="submit" onclick="onSendPressed()">
         <img id="sendIcon" alt ="sendIcon" src="/static/send.png">
     </button>

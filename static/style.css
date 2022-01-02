@@ -112,10 +112,45 @@ space between every text bubble */
 
 /* this is just for the text box and its dimensions, and to vertically align with the button */
 #textBoxInput {
-  width: 640px;
+  width: 602px;
   height: 30px;
   font-size: 16px;
   vertical-align:middle;
+}
+
+/* frame animation for a small glow around text box when speech input has been injected */
+@keyframes buttonGlow {
+        0% {
+          box-shadow: 0 0 2px rgb(180,0,0);
+        }
+        50% {
+          box-shadow: 0 0 10px rgb(255,0,0);
+        }
+        100% {
+          box-shadow: 0 0 2px rgb(180,0,0);
+        }
+}
+
+
+
+/* calls the text box animation */
+.animate {
+  animation-name: buttonGlow;
+  animation-iteration-count: infinite;
+  animation-duration: 1300ms;
+}
+
+
+/* this is just for the mic button */
+#micButton {
+  height: 36px;
+  vertical-align: middle;
+}
+
+/* this is the icon the mic button is using */
+#micIcon {
+  height: 30px;
+
 }
 
 /* this is just for the send button */
@@ -124,7 +159,9 @@ space between every text bubble */
   vertical-align:middle;
 }
 
-/*this is the icon the send button is using */
+/* this is the icon the send button is using */
 #sendIcon {
   height: 30px;
 }
+
+

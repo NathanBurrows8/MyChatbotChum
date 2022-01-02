@@ -16,3 +16,8 @@ def method():
     humanText = data['text']
     getUserInput(humanText)
     return finalResponseText()
+
+
+#other things to do for today:
+#make text to speech output, put vector volume button with no border on header
+#make time work
