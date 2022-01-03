@@ -1,5 +1,7 @@
 # MyChatbotChum
 
+![Intro](https://media.giphy.com/media/OmmsDoFCDwgJjE1lSS/giphy.gif)
+
 DEPENDENCIES NEEDED:
 
 Type the following into your console (in the MyChatbotChum folder):
