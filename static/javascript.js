@@ -1,7 +1,3 @@
-var script = document.createElement('script');
-script.src = 'https://code.jquery.com/jquery-3.4.1.min.js';
-script.type = 'text/javascript';
-document.getElementsByTagName('head')[0].appendChild(script);
 let micRunning = false;
 let volume = 0;
 
@@ -35,21 +31,21 @@ function addRobotMessage(text) {
 
 function addHumanMessage(text) {
     const chatGroup = document.createElement("div");
-    chatGroup.className = "chatGroup human"
+    chatGroup.className = "chatGroup human";
     const actualText = document.createElement("div");
-    actualText.className = "actualText"
+    actualText.className = "actualText";
     chatGroup.appendChild(actualText)
     const bubble = document.createElement("div");
-    bubble.className = "bubble"
-    bubble.innerHTML = text
-    actualText.appendChild(bubble)
+    bubble.className = "bubble";
+    bubble.innerHTML = text;
+    actualText.appendChild(bubble);
     const time = document.createElement("div");
     time.className = "time"
     time.innerHTML = getTime();
     actualText.appendChild(time)
     const chatBox = document.getElementById("chatBox");
-    chatBox.appendChild(chatGroup)
-    chatBox.scrollTop = chatBox.scrollHeight
+    chatBox.appendChild(chatGroup);
+    chatBox.scrollTop = chatBox.scrollHeight;
 
 }
 
@@ -57,27 +53,13 @@ function onSendPressed() {
     const textBoxInput = document.getElementById('textBoxInput');
     if (textBoxInput.value !== "") {
         removeTextGlow();
-        addHumanMessage(textBoxInput.value)
-         $.ajax({
-                type: "POST",
-                url: "/post",
-                contentType: "application/json",
-                data: JSON.stringify({text: textBoxInput.value}),
-                dataType: "json",
-                success: function(response) {
-                    addRobotMessage(response['responseText']);
-                },
-                    //extremely bad practice
-                error: function(err) {
-                    addRobotMessage(err['responseText']);
-                }
-            });
-        textBoxInput.value = ""
+        addHumanMessage(textBoxInput.value);
+        sendToPython(textBoxInput.value);
+        textBoxInput.value = "";
     }
 }
 
 function micAnalysis() {
-
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
