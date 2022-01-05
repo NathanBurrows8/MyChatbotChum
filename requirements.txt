@@ -1,5 +1,6 @@
 spacy==2.3.5
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz
-bs4
-requests
-experta
+bs4==0.0.1
+requests==2.25.1
+experta==1.9.4
+flask-socketio==4.3.2

@@ -28,7 +28,7 @@
   
   
     "question_departure_time": 
-    ["When do you want your departure time to be?"],
+    ["Please specify a time for this outbound journey."],
   
    
     "question_return_time": 
