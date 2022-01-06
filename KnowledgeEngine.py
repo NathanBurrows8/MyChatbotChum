@@ -4,16 +4,12 @@
 import random
 from experta import *
 import json
+import getTicketData
 import userInterface
 import processUserInput
 
 with open("./static/intents.json") as json_file:
     jsondata = json.load(json_file)
-
-
-# conversation flow: ask for each of these, and when gathered, put into these strings. Rules can then be checked
-# against the length of these strings to determine if gathered yet or not
-
 
 class Bot(KnowledgeEngine):
     #put invalid error catching stuff at the top
@@ -22,6 +18,7 @@ class Bot(KnowledgeEngine):
         if "hello" in self.dictionary:
             userInterface.send_response(random.choice(jsondata["hello"]))
             self.declare(Fact(said="hello"))
+            self.declare(Fact(messageSent="true"))
 
     @Rule(salience=49)
     def ask_if_return(self):  # and no strings gathered
@@ -29,8 +26,9 @@ class Bot(KnowledgeEngine):
             processUserInput.isBooking = "true"
             userInterface.send_response(random.choice(jsondata["question_ticket_type"]))
             self.declare(Fact(said="ask_if_return"))
+            self.declare(Fact(messageSent="true"))
 
-    @Rule(NOT(Fact(said="ask_if_return")),
+    @Rule(NOT(Fact(messageSent="true")),
           salience=48)
     def ask_departure_location(self):
         if processUserInput.isBooking == "true":
@@ -39,53 +37,69 @@ class Bot(KnowledgeEngine):
                     processUserInput.isReturn = "false"
                     userInterface.send_response(random.choice(jsondata["question_departure_location"]))
                     self.declare(Fact(said="ask_departure_location"))
+                    self.declare(Fact(messageSent="true"))
                 elif "return" in self.dictionary:
                     processUserInput.isReturn = "true"
                     userInterface.send_response(random.choice(jsondata["question_departure_location"]))
                     self.declare(Fact(said="ask_departure_location"))
+                    self.declare(Fact(messageSent="true"))
 
-    @Rule(NOT(Fact(said="ask_departure_location")),
+
+    @Rule(NOT(Fact(messageSent="true")),
+          salience=45)
+    def ask_arrival_location(self):
+        if len(processUserInput.websiteDeparture) > 0:
+            if processUserInput.websiteDestination == "":
+                userInterface.send_response(random.choice(jsondata["question_arrival_location"]))
+                self.declare(Fact(said="ask_arrival_location"))
+                self.declare(Fact(messageSent="true"))
+
+    @Rule(NOT(Fact(messageSent="true")),
           salience=47)
     def ask_departure_date(self):
-        if len(processUserInput.websiteDeparture) > 0:
+        if len(processUserInput.websiteDestination) > 0:
             if len(processUserInput.websiteDate) == 0:
                 userInterface.send_response(random.choice(jsondata["question_departure_date"]))
                 self.declare(Fact(said="ask_departure_date"))
+                self.declare(Fact(messageSent="true"))
 
-    @Rule(NOT(Fact(said="ask_departure_date")),
+    @Rule(NOT(Fact(messageSent="true")),
           salience=46)
     def ask_departure_time(self):
         if len(processUserInput.websiteDate) > 0:
-            userInterface.send_response(random.choice(jsondata["question_departure_time"]))
-            self.declare(Fact(said="ask_departure_time"))
+            if len(processUserInput.websiteTime) == 0:
+                userInterface.send_response(random.choice(jsondata["question_departure_time"]))
+                self.declare(Fact(said="ask_departure_time"))
+                self.declare(Fact(messageSent="true"))
 
-    @Rule(NOT(Fact(said="ask_departure_time")),
+    @Rule(NOT(Fact(messageSent="true")),
           salience=45)
-    def ask_arrival_location(self):
-        if len(processUserInput.websiteTime) > 0:
-            userInterface.send_response(random.choice(jsondata["question_arrival_location"]))
-            self.declare(Fact(said="ask_arrival_location"))
+    def completeSingleTicket(self):
+        if processUserInput.isBooking == "true":
+            if processUserInput.isReturn == "false":
+                if len(processUserInput.websiteDeparture) > 0 and len(processUserInput.websiteDestination) > 0 and \
+                        len(processUserInput.websiteDate) > 0 and len(processUserInput.websiteTime) > 0:
+                    if len(processUserInput.websiteType) == 0:
+                        processUserInput.websiteType = "dep"
+                    getTicketData.formWebsite(processUserInput.websiteDeparture, processUserInput.websiteDestination,
+                                              processUserInput.websiteDate, processUserInput.websiteTime,
+                                              processUserInput.websiteType)
+                    self.declare(Fact(messageSent="true"))
 
 
 
-    @Rule(NOT(Fact(said="hello")),
-          (NOT(Fact(said="ask_if_return"))),
-          (NOT(Fact(said="ask_departure_date"))),
-          (NOT(Fact(said="ask_departure_location"))),
-          (NOT(Fact(said="ask_departure_time"))),
+
+
+
+
+
+    @Rule(NOT(Fact(messageSent="true")),
           salience=2)
     def panic(self):
-        userInterface.send_response(random.choice(jsondata["unable_to_parse"]))
-        self.declare(Fact(said="panic"))
-
-    @Rule(NOT(Fact(type="delay")),
-          (NOT(Fact(said="hello"))),
-          salience=1)
-    def ask_type(self):
-        if processUserInput.isBooking == "":
-            userInterface.send_response(random.choice(jsondata["question_type_of_booking"]))
-            self.declare(Fact(said="ask_type"))
-
+        if len(processUserInput.givenTicket) == 0:
+            userInterface.send_response(random.choice(jsondata["unable_to_parse"]))
+            self.declare(Fact(said="panic"))
+            self.declare(Fact(messageSent="true"))
 
 def finalResponseText(nlp):
     bot = Bot()
@@ -94,5 +108,9 @@ def finalResponseText(nlp):
     bot.reset()
     watch('RULES')
     bot.run()
+
+
+def getIntroText():
+    return random.choice(jsondata["question_type_of_booking"])
 
 # this is an example from the experta website, read the documentation https://experta.readthedocs.io/en/latest/

@@ -2,6 +2,7 @@ import datetime
 import spacy
 import KnowledgeEngine
 from spacy.matcher import Matcher
+import re
 
 import userInterface
 
@@ -41,41 +42,32 @@ slashDateNoYearRegex = [  # matches dd/mm and assumes this year
 slashDateShorterYearRegex = [  # matches dd/mm/yy
     {"TEXT": {"REGEX": "^(\d\d)[/](\d\d)[/](\d\d)(?!/|\d)"}}
 ]
-writtenDateNoYearRegex = [
-    {"LOWER": {"REGEX": "(\d?\d)([stndh]{2})?"}},
+writtenDateRegex = [
+    {"LOWER": {"REGEX": "(\d?\d)([stndhr]{2})?"}},
     {"LOWER": {"REGEX": "(january|february|march|april|may|june|july|august|september|october|november|december)"}}
 ]
-writtenDateRegex = [
-    {"LOWER": {"REGEX": "(\d?\d)([stndh]{2})?"}},
-    {"LOWER": {"REGEX": "(january|february|march|april|may|june|july|august|september|october|november|december)"}},
-    {"TEXT": {"REGEX": "(\d\d\d\d)"}}
-]
 writtenDateShorterMonthRegex = [
-    {"LOWER": {"REGEX": "(\d\d)[stndh]{2}(Jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s(\d\d\d\d)"}},
-    {"LOWER": {"REGEX": "(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)"}},
-    {"TEXT": {"REGEX": "(\d\d\d\d)"}}
+    {"LOWER": {"REGEX": "(\d?\d)[stndhr]{2}?"}},
+    {"LOWER": {"REGEX": "((jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)(?!\w))"}}
 ]
-writtenDateShorterMonthNoYearRegex = [
-    {"LOWER": {"REGEX": "(\d\d)[stndh]{2}"}},
-    {"LOWER": {"REGEX": "(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)"}}
-]
+
 # add dotted and hyphenated versions of date regex?
 timeRegex = [
-    {"TEXT": {"REGEX": "(\d\d)[:](\d\d)"}}
+    {"TEXT": {"REGEX": "(\d\d)[:](\d\d)(?![\S])"}}
 ]
 writtenTimeMorningRegex = [
-    {"LOWER": {"REGEX": "(\d)?(\d)|(\d)?(\d)(([am]{2}))"}},
-    {"LOWER": {"REGEX": "([am]{2})"}}
+    {"LOWER": {"REGEX": "(\d)?(\d)|(\d)?(\d)(([am]{2}))(?![\S])"}},
+    {"LOWER": {"REGEX": "([am]{2})(?![\S])"}}
 ]
 writtenTimeEveningRegex = [
-    {"LOWER": {"REGEX": "(\d)?(\d)|(\d)?(\d)(([pm]{2}))"}},
-    {"LOWER": {"REGEX": "([pm]{2})"}}
+    {"LOWER": {"REGEX": "(\d)?(\d)|(\d)?(\d)(([pm]{2}))(?![\S])"}},
+    {"LOWER": {"REGEX": "([pm]{2})(?![\S])"}}
 ]
 writtenTimeWithMinutesMorningRegex = [
-    {"LOWER": {"REGEX": "(\d)?(\d)[:](\d\d)(([am]{2}))"}}
+    {"LOWER": {"REGEX": "(\d)?(\d)[:](\d\d)(([am]{2}))(?![\S])"}}
 ]
 writtenTimeWithMinutesEveningRegex = [  # cant currently do 12:45 pm with a space
-    {"LOWER": {"REGEX": "(\d)?(\d)[:](\d\d)(([pm]{2}))"}}
+    {"LOWER": {"REGEX": "(\d)?(\d)[:](\d\d)(([pm]{2}))(?![\S])"}}
 ]
 wordTimeMorningRegex = [
     {"LOWER": {"REGEX": "morning"}}
@@ -103,6 +95,10 @@ arriveBeforeTimeRegex = [
     {"LOWER": {"REGEX": "arrive"}},
     {"LOWER": {"REGEX": "before"}}
 ]
+#add in elif statements to accept multiple KEData in one line? "i want to BOOK a SINGLE ticket"
+#add in a regex for 'from (*)'     and one for 'to (*)' could even add this to above?
+#currently 23rd jan works but not 23 jan - i think this is fine?
+#0am and 0pm are not split by spacy like 1am, etc, so we cannot get specific invalidDate
 
 isBooking = ""
 isDelay = ""
@@ -111,6 +107,7 @@ websiteDestination = ""
 websiteDate = ""
 websiteTime = ""
 websiteType = ""
+givenTicket = ""
 
 isReturn = ""
 websiteReturnDate = ""
@@ -131,9 +128,7 @@ matcher.add("slashDate", [slashDateRegex])
 matcher.add("slashDateNoYear", [slashDateNoYearRegex])
 matcher.add("slashDateShorterYear", [slashDateShorterYearRegex])
 matcher.add("writtenDate", [writtenDateRegex])
-matcher.add("writtenDateNoYear", [writtenDateNoYearRegex])
 matcher.add("writtenDateShorterMonth", [writtenDateShorterMonthRegex])
-matcher.add("writtenDateShorterMonthNoYear", [writtenDateShorterMonthNoYearRegex])
 matcher.add("time", [timeRegex])
 matcher.add("writtenTimeMorning", [writtenTimeMorningRegex])
 matcher.add("writtenTimeEvening", [writtenTimeEveningRegex])
@@ -152,7 +147,7 @@ matcher.add("arriveBefore", [arriveBeforeTimeRegex])
 
 
 def getUserInput(text):
-    global websiteDeparture, websiteDestination, isReturn, websiteType, websiteDate
+    global websiteDeparture, websiteDestination, isReturn, websiteType, websiteDate, websiteTime
     dictionary = {}
     now = datetime.datetime.now()
 
@@ -183,8 +178,27 @@ def getUserInput(text):
             KEData["goodbye"] = "true"
         elif string_id == "today":
             KEData["today"] = "true"
+            date = str(now.day).zfill(2) + str(now.month).zfill(2) + str(now.year)[2:4]
+            if validateDate(date):
+                if isReturn == "false":
+                    if isDateTooFarInFuture(date):
+                        KEData["dateTooFarInFuture"] = "true"
+                    else:
+                        websiteDate = date
+            else:
+                KEData["invalidDate"] = "true"
         elif string_id == "tomorrow":
             KEData["tomorrow"] = "true"
+            tomorrow = now + datetime.timedelta(days=1)
+            date = str(tomorrow.day).zfill(2) + str(tomorrow.month).zfill(2) + str(tomorrow.year)[2:4]
+            if validateDate(date):
+                if isReturn == "false":
+                    if isDateTooFarInFuture(date):
+                        KEData["dateTooFarInFuture"] = "true"
+                    else:
+                        websiteDate = date
+            else:
+                KEData["invalidDate"] = "true"
         elif string_id == "day":
             KEData["day"] = "true"
         elif string_id == "slashDate":
@@ -194,8 +208,10 @@ def getUserInput(text):
             date = date[0:4] + date[6:8]
             if validateDate(date):
                 if isReturn == "false": #need to add return functionality to these
-                    websiteDate = date
-                    print(websiteDate, "website")
+                    if isDateTooFarInFuture(date):
+                        KEData["dateTooFarInFuture"] = "true"
+                    else:
+                        websiteDate = date
             else:
                 KEData["invalidDate"] = "true"
         elif string_id == "slashDateNoYear":
@@ -205,7 +221,10 @@ def getUserInput(text):
             date = date + str(now.year)[2:4]
             if validateDate(date):
                 if isReturn == "false":
-                    websiteDate = date
+                    if isDateTooFarInFuture(date):
+                        KEData["dateTooFarInFuture"] = "true"
+                    else:
+                        websiteDate = date
             else:
                 KEData["invalidDate"] = "true"
         elif string_id == "slashDateShorterYear":
@@ -214,43 +233,140 @@ def getUserInput(text):
             date = date.replace("/", "")
             if validateDate(date):
                 if isReturn == "false":
-                    websiteDate = date
+                    if isDateTooFarInFuture(date):
+                        KEData["dateTooFarInFuture"] = "true"
+                    else:
+                        websiteDate = date
             else:
                 KEData["invalidDate"] = "true"
         elif string_id == "writtenDate":
             KEData["writtenDate"] = "true"
-        elif string_id == "writtenDateNoYear":
-            KEData["writtenDateNoYear"] = "true"
+            date = dictionary["writtenDate"]
+            date = stripOrdinals(date)
+            try:
+                if re.match("\d\d\d\d", date):
+                    formatted = datetime.datetime.strptime(date, "%d %B %Y")
+                else:
+                    date = date + " " + str(now.year)
+                    formatted = datetime.datetime.strptime(date, "%d %B %Y")
+                stringDate = datetimeToString(formatted)
+                if isDateTooFarInFuture(stringDate):
+                    KEData["dateTooFarInFuture"] = "true"
+                else:
+                    websiteDate = stringDate
+            except ValueError:
+                KEData["invalidDate"] = "true"
         elif string_id == "writtenDateShorterMonth":
             KEData["writtenDateShorterMonth"] = "true"
-        elif string_id == "writtenDateShorterMonthNoYear":
-            KEData["writtenDateShorterMonthNoYear"] = "true"
+            date = dictionary["writtenDateShorterMonth"]
+            date = stripOrdinals(date)
+            try:
+                if re.match("\d\d\d\d", date):
+                    formatted = datetime.datetime.strptime(date, "%d %b %Y")
+                else:
+                    date = date + " " + str(now.year)
+                    formatted = datetime.datetime.strptime(date, "%d %b %Y")
+                stringDate = datetimeToString(formatted)
+                if isDateTooFarInFuture(stringDate):
+                    KEData["dateTooFarInFuture"] = "true"
+                else:
+                    websiteDate = stringDate
+            except ValueError:
+                KEData["invalidDate"] = "true"
         elif string_id == "time":
             KEData["time"] = "true"
+            time = str(dictionary["time"])
+            time = time.replace(":", "")
+            if validateTime(time):
+                websiteTime = time
+            else:
+                KEData["invalidTime"] = "true"
         elif string_id == "writtenTimeMorning":
             KEData["writtenTimeMorning"] = "true"
+            time = str(dictionary["writtenTimeMorning"])
+            number = int(re.search(r"\d+", time).group())
+            if number < 1 or number > 12:
+                KEData["invalidTime"] = "true"
+            else:
+                if number == 12:
+                    number = 0
+                number = str(number).zfill(2)
+                number = number + "00"
+                if validateTime(number):
+                    websiteTime = number
+                else:
+                    KEData["invalidTime"] = "true"
         elif string_id == "writtenTimeEvening":
             KEData["writtenTimeEvening"] = "true"
+            time = str(dictionary["writtenTimeEvening"])
+            number = int(re.search(r"\d+", time).group())
+            if number < 1 or number > 12:
+                KEData["invalidTime"] = "true"
+            else:
+                if number != 12:
+                    number = number + 12
+                number = str(number) + "00"
+                if validateTime(number):
+                    websiteTime = number
+                else:
+                    KEData["invalidTime"] = "true"
         elif string_id == "writtenTimeWithMinutesMorning":
             KEData["writtenTimeWithMinutesMorning"] = "true"
+            time = str(dictionary["writtenTimeWithMinutesMorning"])
+            time = time.replace("am", "")
+            index = time.index(":")
+            hour = time[0:index]
+            minutes = time[index + 1:]
+            if int(hour) < 1 or int(hour) > 12:
+                KEData["invalidTime"] = "true"
+            else:
+                if hour == "12":
+                    hour = "00"
+                time = hour.zfill(2) + minutes.zfill(2)
+                if validateTime(time):
+                    websiteTime = time
+                else:
+                    KEData["invalidTime"] = "true"
         elif string_id == "writtenTimeWithMinutesEvening":
             KEData["writtenTimeWithMinutesEvening"] = "true"
+            time = str(dictionary["writtenTimeWithMinutesEvening"])
+            time = time.replace("pm", "")
+            index = time.index(":")
+            hour = time[0:index]
+            minutes = time[index + 1:]
+            if (int(hour)) < 1 or int(hour) > 12:
+                KEData["invalidTime"] = "true"
+            else:
+                if int(hour) != 12:
+                    hour = int(hour) + 12
+                time = str(hour).zfill(2) + minutes.zfill(2)
+                if validateTime(time):
+                    websiteTime = time
+                else:
+                    KEData["invalidTime"] = "true"
         elif string_id == "wordTimeMorning":
             KEData["wordTimeMorning"] = "true"
+            websiteTime = "0900"
         elif string_id == "wordTimeEvening":
             KEData["wordTimeEvening"] = "true"
+            websiteTime = "1800"
         elif string_id == "wordTimeAfternoon":
             KEData["wordTimeAfternoon"] = "true"
+            websiteTime = "1300"
         elif string_id == "wordTimeNoon":
             KEData["wordTimeNoon"] = "true"
+            websiteTime = "1200"
         elif string_id == "wordTimeMidnight":
             KEData["wordTimeMidnight"] = "true"
+            websiteTime = "0000"
         elif string_id == "noTimeGiven":
             KEData["noTimeGiven"] = "true"
-        elif string_id == "departBefore":
-            KEData["departBefore"] = "true"
+            websiteTime = "1000"
         elif string_id == "arriveBefore":
             KEData["arriveBefore"] = "true"
+        elif string_id == "departBefore":
+            KEData["departBefore"] = "true"
+
     if (len(regex_matches) == 0):
         KEData["noMatches"] = "true"
     if len(isReturn) > 0:
@@ -260,7 +376,7 @@ def getUserInput(text):
             if websiteDeparture != text:
                  websiteDestination = text
             else:
-                userInterface.send_response("Sorry, the destination and departure locations cannot be the same! Please tell me a different destination:")
+                userInterface.send_response("Sorry, the destination and departure locations cannot be the same!")
 
 
     if (len(websiteDestination) > 0) & (isReturn == "false"):
@@ -274,19 +390,29 @@ def getUserInput(text):
 
 
 
-
-
-
-
     KEData["userText"] = text
 
     KnowledgeEngine.finalResponseText(KEData)
 
 
+
+
+
+def validateTime(string):
+    # pass time in format HHMM
+    print("this the time i got bro", string)
+    hours = int(string[0:2])
+    minutes = int(string[2:4])
+    try:
+        formattedTime = datetime.time(hours, minutes, 00)
+    except ValueError:
+        return False
+    return True
+
+
 def validateDate(string):
     # pass date in format DDMMYY
     today = datetime.datetime.now()
-    print(string, "string")
     inputtedDay = string[0:2]
     inputtedMonth = string[2:4]
     inputtedYear = "20" + string[4:6]
@@ -295,12 +421,48 @@ def validateDate(string):
         fullInputtedDateTime = datetime.datetime.strptime(fullInputtedDate, "%d/%m/%Y")
     except ValueError:
         return False
-    print(fullInputtedDateTime.date(), "1")
-    print(today.date(), "2")
     return fullInputtedDateTime.date() > today.date()
+
+def isDateTooFarInFuture(string):
+    # pass date in format DDMMYY
+    maxDateForNationalRail = datetime.datetime(2022, 3, 30)
+    inputtedDay = string[0:2]
+    inputtedMonth = string[2:4]
+    inputtedYear = "20" + string[4:6]
+    fullInputtedDate = inputtedDay + "/" + inputtedMonth + "/" + inputtedYear
+    fullInputtedDateTime = datetime.datetime.strptime(fullInputtedDate, "%d/%m/%Y")
+    return fullInputtedDateTime.date() > maxDateForNationalRail.date()
+
+def stripOrdinals(date):
+    date = str(date)
+    date = date.replace("st", "").replace("nd", "").replace("rd", "").replace("th", "")
+    return date
+
+def datetimeToString(date):
+    string = str(date.day).zfill(2) + str(date.month).zfill(2) + str(date.year)[2:4]
+    print(string, "string")
+    return string
+
+def resetStrings():
+    global websiteDeparture, websiteDestination, websiteDate, websiteTime, websiteType, websiteReturnDate, \
+        websiteReturnTime, websiteReturnType, isBooking, isReturn, isDelay, givenTicket
+    isBooking = ""
+    isReturn  = ""
+    isDelay = ""
+    websiteDeparture = ""
+    websiteDestination = ""
+    websiteDate = ""
+    websiteTime = ""
+    websiteType = ""
+    websiteReturnDate = ""
+    websiteReturnTime = ""
+    websiteReturnType = ""
+    givenTicket = ""
+
 
 
 # verify named entity as location/dummy ticket purchase before moving on to the next step? so user can instantly
 # try another location?
 
 # change so that opening text is it explaining its functions?
+#cant do dates later than 30th march!! add this as specific error?

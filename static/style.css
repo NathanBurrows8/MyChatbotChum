@@ -37,6 +37,7 @@ body {
   height: 700px;
   max-height:700px;
   background-color: white;
+  margin-bottom: 10px;
 }
 
 /* General css for text bubbles, this mainly concerns the robots bubbles as the humans are overridden later in the

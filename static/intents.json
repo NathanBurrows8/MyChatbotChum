@@ -8,7 +8,7 @@
   
   
     "question_type_of_booking": 
-    ["What would you like me to do? I can either help you make a booking, or find potential delays.", "Would you like me to help find potential delays, or assist with a booking?"],
+    ["Hi! What would you like me to do? I can either help you make a booking, or find potential delays.", "Hi there! Would you like me to help find potential delays, or assist with a booking?"],
   
   
     "unable_to_parse": 

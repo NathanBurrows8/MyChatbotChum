@@ -2,47 +2,52 @@ import requests
 import csv
 import json
 from bs4 import BeautifulSoup
+import processUserInput
+import userInterface
 
-stationCodes = {}
-reader = csv.reader(open('static/crs_codes.csv'))
-for row in reader:
-    key = row[0]
-    stationCodes[key] = row[1]
+websiteDate = ""
+websiteReturnDate = ""
+
 
 # change these 5 things for now to test the program
 
-websiteDeparture = "Norwich"
-websiteDestination = "Swansea"
-websiteDate = "200122"
-websiteTime = "1100"    #no way to search website without a time? maybe just default to dep 10:00 or something
-websiteType = "first"  # 'dep' = "depart after", 'arr' = "arrive before", 'last', 'first'<-for "depart before"
-websiteReturnDate = "300122"
-websiteReturnTime = "1300"
-websiteReturnType = "dep"
+def searchForLocations(websiteDeparture, websiteDestination):
+    stationCodes = {}
+    reader = csv.reader(open('static/crs_codes.csv'))
+    for row in reader:
+        key = row[0]
+        stationCodes[key] = row[1]
+    try:
+        websiteDeparture = stationCodes[websiteDeparture]
+    except Exception as e:
+        print("{No specific station found for '" + websiteDeparture +
+              "'. Attempting to search using the location instead..}")
+        pass
 
-try:
-    websiteDeparture = stationCodes[websiteDeparture]
-except Exception as e:
-    print("{No specific station found for '" + websiteDeparture +
-          "'. Attempting to search using the location instead..}")
-    pass
-
-try:
-    websiteDestination = stationCodes[websiteDestination]
-except Exception as e:
-    print("{No specific station found for '" + websiteDestination +
-          "'. Attempting to search using the location instead..}")
+    try:
+        websiteDestination = stationCodes[websiteDestination]
+    except Exception as e:
+        print("{No specific station found for '" + websiteDestination +
+              "'. Attempting to search using the location instead..}")
+    return websiteDeparture, websiteDestination
 
 
-def formWebsiteReturn(websiteDeparture, websiteDestination, websiteDate, websiteTime, websiteType, websiteReturnDate,
-                      websiteReturnTime, websiteReturnType):
+def formWebsiteReturn(websiteDeparture, websiteDestination, siteDate, websiteTime, websiteType, siteReturnDate, websiteReturnTime, websiteReturnType):
+    websiteDeparture, websiteDestination = searchForLocations(websiteDeparture, websiteDestination)
+    global websiteDate, websiteReturnDate
+    websiteDate = siteDate
+    websiteReturnDate = siteReturnDate
+
     website = "https://ojp.nationalrail.co.uk/service/timesandfares/" + websiteDeparture + "/" + websiteDestination \
               + "/" + websiteDate + "/" + websiteTime + "/" + websiteType + "/" + websiteReturnDate + "/" \
               + websiteReturnTime + "/" + websiteReturnType
     getData(website)
 
 
-def formWebsite(websiteDeparture, websiteDestination, websiteDate, websiteTime, websiteType):
+def formWebsite(websiteDeparture, websiteDestination, siteDate, websiteTime, websiteType):
+    global websiteDate
+    websiteDate = siteDate
+    websiteDeparture, websiteDestination = searchForLocations(websiteDeparture, websiteDestination)
     website = "https://ojp.nationalrail.co.uk/service/timesandfares/" + websiteDeparture + "/" + websiteDestination \
               + "/" + websiteDate + "/" + websiteTime + "/" + websiteType
     getData(website)
@@ -101,6 +106,7 @@ def parseData(hasCheapest, website):
 
 
 def printReturnTicket(dict1, dict2, dict3, dict4, cheapestOutboundPrice, cheapestInboundPrice, website):
+    global websiteDate
     print("-----------------------------FOR " + websiteDate[0:2] + "/" + websiteDate[2:4] + "/" + websiteDate[4:6] +
           "----------------------------")
     print("The cheapest outbound journey departs from " + str(dict1['departureStationName']) + " at " +
@@ -132,30 +138,29 @@ def printReturnTicket(dict1, dict2, dict3, dict4, cheapestOutboundPrice, cheapes
     print("The ticket will cost £" + f'{cheapestOutboundPrice + cheapestInboundPrice:.2f}' + ". " +
           "(Outbound = £" + f'{cheapestOutboundPrice:.2f}' + ", Inbound = £" + f'{cheapestOutboundPrice:.2f}' + ")")
     print(website)
+    processUserInput.givenTicket = "true"
 
 
 def printTicket(dict1, dict2, cheapestPrice, website):
-    print("-----------------------------FOR " + websiteDate[0:2] + "/" + websiteDate[2:4] + "/" + websiteDate[4:6] +
-          "----------------------------")
-    print("The cheapest journey departs from " + str(dict1['departureStationName']) + " at " + str(
-        dict1['departureTime']) +
-          ", and arrives at " + str(dict1['arrivalStationName']) + " at " + str(dict1['arrivalTime']) + ".")
-    print("The journey will take " + str(dict1['durationHours']) + " hours and " + str(dict1['durationMinutes']) +
-          " minutes, and has " + str(dict1['changes']) + " changes.")
-    print("The ticket will cost £" + f'{cheapestPrice:.2f}' + ".")
-    print("(Journey provided by " + str(dict2['tocName']) + ")")
+    global websiteDate, websiteReturnDate
+    ticket = "------------------------FOR " + websiteDate[0:2] + "/" + websiteDate[2:4] + "/" + websiteDate[4:6] \
+             + "-----------------------<br> The cheapest journey departs from " \
+             + str(dict1['departureStationName']) + "</mark> at " + str(dict1['departureTime']) + ", and arrives at " \
+             + str(dict1['arrivalStationName']) + " at " + str(dict1['arrivalTime']) + ".<br> The journey will take " \
+             + str(dict1['durationHours']) + " hours and " + str(dict1['durationMinutes']) + " minutes, and has " \
+             + str(dict1['changes']) + " changes.<br> The ticket will cost £" + f'{cheapestPrice:.2f}' + ".<br>" \
+             + "To view your booking, <a href=\"" + website + "\" target=\"_blank\"> click here.</a> <br> " \
+             + "(Journey provided by " + str(dict2['tocName']) + ")<br>"
     if dict1['statusIcon'] == "AMBER_TRIANGLE":
         if dict1['statusMessage'] == "bus service":
-            print("(Some or all of this journey is via bus. Check the booking website for details.)")
+            ticket = ticket + "(Some or all of this journey is via bus. Check the booking website for details)<br>"
         else:
-            print("(There may be some disruption on this route. Check the booking website for details.)")
+            ticket = ticket + "(There may be some disruption on this route. Check the booking website for details)"
+
+    userInterface.send_response(ticket)
     print(website)
+    processUserInput.givenTicket = "true"
 
-
-
-formWebsiteReturn(websiteDeparture, websiteDestination, websiteDate, websiteTime, websiteType, websiteReturnDate,
-                  websiteReturnTime, websiteReturnType)
-#formWebsite(websiteDeparture, websiteDestination, websiteDate, websiteTime, websiteType)
 
 
 

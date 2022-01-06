@@ -1,6 +1,8 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO
-from processUserInput import getUserInput
+
+import KnowledgeEngine
+import processUserInput
 
 app = Flask(__name__)
 app.debug = True
@@ -13,11 +15,19 @@ def get_data():
 
 socketio = SocketIO(app, cors_allowed_origins='*')
 
+@socketio.on("connect")
+def intro():
+    send_response(KnowledgeEngine.getIntroText())
 
 # using websockets to send data between javascript and python
 @socketio.on("message_from_javascript")
 def handle_message(data):
-    getUserInput(data)
+    processUserInput.getUserInput(data)
+
+
+@socketio.on("page_reload")
+def reload(data):
+    processUserInput.resetStrings()
 
 
 def send_response(text):

@@ -16,6 +16,9 @@
           socket.on('message_from_python', function(msg) {
               addRobotMessage(msg);
           });
+          if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
+              socket.emit('page_reload', 200);
+          }
       </script>
   </head>
 
