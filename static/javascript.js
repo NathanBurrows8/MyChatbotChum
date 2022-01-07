@@ -107,8 +107,10 @@ function removeTextGlow() {
 }
 
 function speech(text) {
+    let index = text.indexOf("<br>")
+    let newText = text.slice(index+3)
     var synth = window.speechSynthesis;
-    var utter = new SpeechSynthesisUtterance(text);
+    var utter = new SpeechSynthesisUtterance(newText);
     utter.volume = volume;
     synth.speak(utter);
 }
