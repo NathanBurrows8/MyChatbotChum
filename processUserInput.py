@@ -182,8 +182,9 @@ def getUserInput(text):
             KEData["booking"] = "true"
             isBooking = "true"
             text = text.lower()
-            if re.match("(?<![\w\d])from(?![\w\d])", text):
-                if re.match("(?<![\w\d])to(?![\w\d])", text):
+            print("here originally")
+            if re.search("(?<![\w\d])from(?![\w\d])", text):
+                if re.search("(?<![\w\d])to(?![\w\d])", text):
                     a, b = text.find(' from '), text.find(' to ')
                     departure = text[a + 6:b]
                     destination = text[b + 4:]
@@ -475,12 +476,14 @@ def getUserInput(text):
         KEData["noMatches"] = "true"
     if len(isReturn) > 0:
         if (len(websiteDestination) == 0) and (len(websiteDeparture) == 0) and "booking" not in KEData:
-            websiteDeparture = text
+            if "single" not in KEData and "return" not in KEData:
+                websiteDeparture = text
         elif (len(websiteDeparture) > 0) and (len(websiteDestination) == 0) and "booking" not in KEData:
-            if websiteDeparture != text:
-                websiteDestination = text
-            else:
-                userInterface.send_response("Sorry, the destination and departure locations cannot be the same!")
+            if "single" not in KEData and "return" not in KEData:
+                if websiteDeparture != text:
+                    websiteDestination = text
+                else:
+                    userInterface.send_response("Sorry, the destination and departure locations cannot be the same!")
 
     if (len(websiteDestination) > 0) & (isReturn == "false"):
         # parse time
@@ -492,6 +495,15 @@ def getUserInput(text):
             websiteType = "dep"
 
     KEData["userText"] = text
+
+    print("WEBSITE_DEPARTURE", websiteDeparture)
+    print("WEBSITE_DESTINATION", websiteDestination)
+    print("IS_BOOKING", isBooking)
+    print("IS_RETURN", isReturn)
+    print("WEBSITE_DATE", websiteDate)
+    print("WEBSITE_TIME", websiteTime)
+    print("WEBSITE_TYPE", websiteType)
+
 
     KnowledgeEngine.finalResponseText(KEData)
 
