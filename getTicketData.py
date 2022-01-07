@@ -141,13 +141,43 @@ def printReturnTicket(dict1, dict2, dict3, dict4, cheapestOutboundPrice, cheapes
 
 def printTicket(dict1, dict2, cheapestPrice, website):
     global websiteDate, websiteReturnDate
+    timeString = "The journey will take "
+    extraTimeString = ""
+    extraMinuteString = ""
+    andNeeded = True
+    exactlyNeeded = False
+
+    if str(dict1['durationHours']) == "0":
+        andNeeded = False
+    elif str(dict1['durationHours']) == "1":
+        extraTimeString = "1 hour "
+    else:
+       extraTimeString = str(dict1['durationHours']) + " hours "
+    if str(dict1['durationMinutes']) == "0":
+        exactlyNeeded = True
+        andNeeded = False
+    elif str(dict1['durationMinutes']) == "1":
+        extraMinuteString = "1 minute, "
+    else:
+        extraMinuteString = str(dict1['durationMinutes']) + " minutes, "
+
+    if andNeeded:
+        timeString = timeString + extraTimeString + " and "  + extraMinuteString + "and has " + str(dict1['changes']) \
+            + " changes.<br>"
+    else:
+        if exactlyNeeded:
+            timeString = timeString + "exactly " + extraTimeString + "and has " + str(dict1['changes']) \
+                + " changes.<br>"
+        else:
+            timeString = timeString + extraTimeString + extraMinuteString + "and has " + str(dict1['changes']) \
+                + " changes.<br>"
+
     ticket = "------------------------FOR " + websiteDate[0:2] + "/" + websiteDate[2:4] + "/" + websiteDate[4:6] \
              + "-----------------------<br> The cheapest journey departs from " \
              + str(dict1['departureStationName']) + "</mark> at " + str(dict1['departureTime']) + ", and arrives at " \
-             + str(dict1['arrivalStationName']) + " at " + str(dict1['arrivalTime']) + ".<br> The journey will take " \
-             + str(dict1['durationHours']) + " hours and " + str(dict1['durationMinutes']) + " minutes, and has " \
-             + str(dict1['changes']) + " changes.<br> The ticket will cost £" + f'{cheapestPrice:.2f}' + ".<br>" \
-             + "To view your booking, <a href=\"" + website + "\" target=\"_blank\"> click here.</a> <br> " \
+             + str(dict1['arrivalStationName']) + " at " + str(dict1['arrivalTime']) + ".<br>" + timeString \
+             + "The ticket will cost £" + f'{cheapestPrice:.2f}' + ".<br> To view your booking, <a href=\"" \
+             + website + "\" target=\"_blank\"> click here.</a> <br> " \
              + "(Journey provided by " + str(dict2['tocName']) + ")<br>"
     if dict1['statusIcon'] == "AMBER_TRIANGLE":
         if dict1['statusMessage'] == "bus service":
