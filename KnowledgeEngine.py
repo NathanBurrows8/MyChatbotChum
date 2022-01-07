@@ -23,26 +23,19 @@ class Bot(KnowledgeEngine):
     @Rule(salience=49)
     def ask_if_return(self):  # and no strings gathered
         if "booking" in self.dictionary:
-            processUserInput.isBooking = "true"
-            userInterface.send_response(random.choice(jsondata["question_ticket_type"]))
-            self.declare(Fact(said="ask_if_return"))
-            self.declare(Fact(messageSent="true"))
+            if "single" not in self.dictionary and "return" not in self.dictionary:
+                userInterface.send_response(random.choice(jsondata["question_ticket_type"]))
+                self.declare(Fact(said="ask_if_return"))
+                self.declare(Fact(messageSent="true"))
 
     @Rule(NOT(Fact(messageSent="true")),
           salience=48)
     def ask_departure_location(self):
         if processUserInput.isBooking == "true":
             if processUserInput.websiteDeparture == "":
-                if "single" in self.dictionary:
-                    processUserInput.isReturn = "false"
-                    userInterface.send_response(random.choice(jsondata["question_departure_location"]))
-                    self.declare(Fact(said="ask_departure_location"))
-                    self.declare(Fact(messageSent="true"))
-                elif "return" in self.dictionary:
-                    processUserInput.isReturn = "true"
-                    userInterface.send_response(random.choice(jsondata["question_departure_location"]))
-                    self.declare(Fact(said="ask_departure_location"))
-                    self.declare(Fact(messageSent="true"))
+                userInterface.send_response(random.choice(jsondata["question_departure_location"]))
+                self.declare(Fact(said="ask_departure_location"))
+                self.declare(Fact(messageSent="true"))
 
 
     @Rule(NOT(Fact(messageSent="true")),
@@ -85,8 +78,7 @@ class Bot(KnowledgeEngine):
                                               processUserInput.websiteDate, processUserInput.websiteTime,
                                               processUserInput.websiteType)
                     self.declare(Fact(messageSent="true"))
-
-
+                    processUserInput.resetStrings()
 
 
 

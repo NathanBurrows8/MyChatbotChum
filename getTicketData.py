@@ -8,9 +8,6 @@ import userInterface
 websiteDate = ""
 websiteReturnDate = ""
 
-
-# change these 5 things for now to test the program
-
 def searchForLocations(websiteDeparture, websiteDestination):
     stationCodes = {}
     reader = csv.reader(open('static/crs_codes.csv'))
@@ -103,6 +100,7 @@ def parseData(hasCheapest, website):
         printReturnTicket(dict1, dict2, dict3, dict4, cheapestOutboundPrice, cheapestInboundPrice, website)
     else:
         print("No results were found for the journey - were the locations inputted correctly?")
+        print(website)
 
 
 def printReturnTicket(dict1, dict2, dict3, dict4, cheapestOutboundPrice, cheapestInboundPrice, website):
@@ -160,10 +158,3 @@ def printTicket(dict1, dict2, cheapestPrice, website):
     userInterface.send_response(ticket)
     print(website)
     processUserInput.givenTicket = "true"
-
-
-
-
-
-
-#needs validation! is time in past? etc

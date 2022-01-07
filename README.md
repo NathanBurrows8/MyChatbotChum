@@ -43,3 +43,50 @@ used with SeekPNG licence (no attribution required)
 -recording gif, volume icons
 created by Nathan Burrows
 
+CONVERSATION FLOW:
+
+-----'I can either help you make a booking, or find delays'
+
+-"book me a train ticket"
+-"a booking"
+-"i'd like to book a single ticket"
+-"book me a return ticket"
+
+-"I want to find delays"
+-"predict delay"
+-"is my train delayed?"
+
+-----'Where would you like to depart from/travel to?'
+
+-"London"
+-"London Euston"
+-"EUS"
+
+-----'What date will you be leaving on?'
+
+-"28th February 2022"
+-"28th of February"
+-"28th February"
+-"28th of Feb"
+-"28th Feb"
+-"28/02/2022"
+-"28/02/22"
+-"28/02"
+-"today"
+-"tomorrow"
+-"monday/tuesday/wednesday.....etc"
+
+-----'Please specify a time for this journey.'
+
+-"13:45"
+-"1:45 pm"
+-"1:45 p.m."
+-"12 pm"
+-"morning"
+-"afternoon"
+-"evening"
+-"noon"
+-"midnight"
+-"whenever"
+-"I want to arrive before 4pm"
+-"I want to leave before 12:45"
