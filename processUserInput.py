@@ -104,6 +104,7 @@ arriveBeforeTimeRegex = [
     {"LOWER": {"REGEX": "arrive|arriving"}},
     {"LOWER": {"REGEX": "before"}}
 ]
+
 # add in a regex for 'from (*)'     and one for 'to (*)' could even add this so I want to BOOK a SINGLE ticket from X to Y?
 # currently 23rd jan works but not 23 jan - i think this is fine?
 # 0am and 0pm are not split by spacy like 1am, etc, so we cannot get specific invalidDate error message
@@ -180,6 +181,16 @@ def getUserInput(text):
         elif string_id == "booking":
             KEData["booking"] = "true"
             isBooking = "true"
+            text = text.lower()
+            if re.match("(?<![\w\d])from(?![\w\d])", text):
+                if re.match("(?<![\w\d])to(?![\w\d])", text):
+                    a, b = text.find(' from '), text.find(' to ')
+                    departure = text[a + 6:b]
+                    destination = text[b + 4:]
+                    print("website dep", websiteDeparture)
+                    print("website des", websiteDestination)
+                    websiteDeparture = departure
+                    websiteDestination = destination
             if "single" in text:
                 KEData["single"] = "true"
                 isReturn = "false"
@@ -190,8 +201,10 @@ def getUserInput(text):
             KEData["delay"] = "true"
         elif string_id == "single":
             KEData["single"] = "true"
+            isReturn = "false"
         elif string_id == "return":
             KEData["return"] = "true"
+            isReturn = "true"
         elif string_id == "goodbye":
             KEData["goodbye"] = "true"
         elif string_id == "today":
@@ -551,5 +564,4 @@ def resetStrings():
 
 # verify named entity as location/dummy ticket purchase before moving on to the next step? so user can instantly
 # try another location?
-
 

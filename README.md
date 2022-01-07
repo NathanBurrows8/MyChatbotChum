@@ -49,12 +49,16 @@ CONVERSATION FLOW:
 
 -"book me a train ticket"
 -"a booking"
--"i'd like to book a single ticket"
+-"I'd like to book a single ticket"
 -"book me a return ticket"
+-"I want a single ticket from northampton to london"
+-"I want a ticket from northampton to london"
 
 -"I want to find delays"
 -"predict delay"
 -"is my train delayed?"
+
+NOTE: If you do not specify single/return here when you ask to book a train, a follow-up question is asked
 
 -----'Where would you like to depart from/travel to?'
 

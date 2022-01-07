@@ -65,6 +65,7 @@ class Bot(KnowledgeEngine):
                 self.declare(Fact(said="ask_departure_time"))
                 self.declare(Fact(messageSent="true"))
 
+
     @Rule(NOT(Fact(messageSent="true")),
           salience=45)
     def completeSingleTicket(self):
