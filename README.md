@@ -10,11 +10,9 @@ Type the following into your console (in the MyChatbotChum folder):
 
 INSTRUCTIONS FOR USE: (Windows)
 
-Type the following 3 commands into your console (in the folder the project is in):
+Type the following 2 commands into powershell/terminal (in the folder this project is in):
 
     $env:FLASK_APP = "userInterface" 
-
-    $env:FLASK_ENV = "development"
 
     flask run
 
