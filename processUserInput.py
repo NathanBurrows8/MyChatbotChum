@@ -6,10 +6,10 @@ import re
 import userInterface
 
 helloRegex = [
-    {"LOWER": {"REGEX": "hi|hey|yo|hello"}}
+    {"LOWER": {"REGEX": "hi(?![\S])|hey(?![\S])|yo(?![\S])|hello(?![\S])"}}
 ]
 goodbyeRegex = [
-    {"LOWER": {"REGEX": "goodbye|bye|cya|quit|exit"}}
+    {"LOWER": {"REGEX": "goodbye(?![\S])|bye(?![\S])|cya(?![\S])|quit(?![\S])|exit(?![\S])"}}
 ]
 bookingRegex = [
     {"LOWER": {"REGEX": "booking|book|ticket|buy"}}
@@ -192,15 +192,7 @@ def getUserInput(text):
         elif string_id == "booking":
             KEData["booking"] = "true"
             isBooking = "true"
-            text = text.lower()
-            if re.search("(?<![\w\d])from(?![\w\d])", text):
-                if re.search("(?<![\w\d])to(?![\w\d])", text):
-                    a, b = text.find(' from '), text.find(' to ')
-                    if b > a:
-                        departure = text[a + 6:b]
-                        destination = text[b + 4:]
-                        websiteDeparture = departure
-                        websiteDestination = destination
+            parseFromAndTo(text)
             if "single" in text:
                 KEData["single"] = "true"
                 isReturn = "false"
@@ -211,10 +203,12 @@ def getUserInput(text):
             KEData["delay"] = "true"
         elif string_id == "single":
             KEData["single"] = "true"
+            parseFromAndTo(text)
             isReturn = "false"
         elif string_id == "return":
             KEData["return"] = "true"
             isReturn = "true"
+            parseFromAndTo(text)
         elif string_id == "goodbye":
             KEData["goodbye"] = "true"
         elif string_id == "today":
@@ -520,6 +514,20 @@ def getUserInput(text):
 
 
     KnowledgeEngine.finalResponseText(KEData)
+
+
+def parseFromAndTo(text):
+    global websiteDeparture, websiteDestination
+    text = text.lower()
+    if re.search("(?<![\w\d])from(?![\w\d])", text):
+        if re.search("(?<![\w\d])to(?![\w\d])", text):
+            a, b = text.find(' from '), text.find(' to ')
+            if b > a:
+                departure = text[a + 6:b]
+                destination = text[b + 4:]
+                websiteDeparture = departure
+                websiteDestination = destination
+
 
 def parseDate(date, format):
     now = datetime.datetime.now()

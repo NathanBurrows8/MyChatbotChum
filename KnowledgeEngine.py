@@ -14,13 +14,18 @@ with open("./static/intents.json") as json_file:
 class Bot(KnowledgeEngine):
     #put invalid error catching stuff at the top
 
-
+    @Rule(salience=53)
+    def invalid_time(self):
+        if "invalidTime" in self.dictionary:
+            userInterface.send_response(random.choice(jsondata["validation_invalid_time"]))
+            self.declare(Fact(said="invalid_time"))
+            self.declare(Fact(messageSend="true"))
 
     @Rule(salience=52)
     def date_in_future(self):
         if "dateTooFarInFuture" in self.dictionary:
             userInterface.send_response(random.choice(jsondata["validation_future_date"]))
-            self.declare(Fact(said="date_in_future0"))
+            self.declare(Fact(said="date_in_future"))
             self.declare(Fact(messageSent="true"))
 
     @Rule(salience=51)
