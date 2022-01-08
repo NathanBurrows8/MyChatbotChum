@@ -108,7 +108,7 @@ function removeTextGlow() {
 
 function speech(text) {
     let index = text.indexOf("<br>")
-    let newText = text.slice(index+3)
+    var newText = text.replace(/------------------------FOR \d\d\/\d\d\/\d\d-----------------------/g, "")
     var synth = window.speechSynthesis;
     var utter = new SpeechSynthesisUtterance(newText);
     utter.volume = volume;

@@ -184,6 +184,7 @@ def getUserInput(text):
 
     KEData = {}
     for string_id in dictionary:
+        #08-01-22 : this elif statement is 319 lines long
         if string_id == "hello":
             KEData["hello"] = "true"
         elif string_id == "booking":
@@ -282,13 +283,7 @@ def getUserInput(text):
             date = dictionary["writtenDate"]
             date = stripOrdinals(date)
             try:
-                if re.match("\d\d\d\d", date):
-                    formatted = datetime.datetime.strptime(date, "%d %B %Y")
-                else:
-                    date = date + " " + str(now.year)
-                    print(date)
-                    formatted = datetime.datetime.strptime(date, "%d %B %Y")
-                stringDate = datetimeToString(formatted)
+                stringDate = parseDate(date, "%d %B %Y")
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
@@ -300,12 +295,7 @@ def getUserInput(text):
             date = dictionary["writtenDateShorterMonth"]
             date = stripOrdinals(date)
             try:
-                if re.match("\d\d\d\d", date):
-                    formatted = datetime.datetime.strptime(date, "%d %b %Y")
-                else:
-                    date = date + " " + str(now.year)
-                    formatted = datetime.datetime.strptime(date, "%d %b %Y")
-                stringDate = datetimeToString(formatted)
+                stringDate = parseDate(date, "%d %b %Y")
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
@@ -318,12 +308,7 @@ def getUserInput(text):
             date = date.replace("of ", "")
             date = stripOrdinals(date)
             try:
-                if re.match("\d\d\d\d", date):
-                    formatted = datetime.datetime.strptime(date, "%d %B %Y")
-                else:
-                    date = date + " " + str(now.year)
-                    formatted = datetime.datetime.strptime(date, "%d %B %Y")
-                stringDate = datetimeToString(formatted)
+                stringDate = parseDate(date, "%d %B %Y")
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
@@ -336,12 +321,7 @@ def getUserInput(text):
             date = date.replace("of ", "")
             date = stripOrdinals(date)
             try:
-                if re.match("\d\d\d\d", date):
-                    formatted = datetime.datetime.strptime(date, "%d %b %Y")
-                else:
-                    date = date + " " + str(now.year)
-                    formatted = datetime.datetime.strptime(date, "%d %b %Y")
-                stringDate = datetimeToString(formatted)
+                stringDate = parseDate(date, "%d %b %Y")
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
@@ -539,6 +519,15 @@ def getUserInput(text):
 
     KnowledgeEngine.finalResponseText(KEData)
 
+def parseDate(date, format):
+    now = datetime.datetime.now()
+    if re.match("\d\d\d\d", date):
+        formatted = datetime.datetime.strptime(date, format)
+    else:
+        date = date + " " + str(now.year)
+        formatted = datetime.datetime.strptime(date, format)
+    stringDate = datetimeToString(formatted)
+    return stringDate
 
 
 def validateTime(string):
