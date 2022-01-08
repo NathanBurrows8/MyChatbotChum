@@ -60,7 +60,6 @@ writtenDateShorterMonthOfRegex = [
     {"LOWER": {"REGEX": "((jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)(?!\w))"}}
 ]
 
-# add dotted and hyphenated versions of date regex?
 timeRegex = [
     {"TEXT": {"REGEX": "(\d?\d)[:](\d\d)(?![\S])"}}
 ]
@@ -93,7 +92,7 @@ wordTimeNoonRegex = [
 wordTimeMidnightRegex = [
     {"LOWER": {"REGEX": "midnight"}}
 ]
-noTimeGivenRegex = [  # default to 'dep' 10:00?, 'dep' is normal default anyway
+noTimeGivenRegex = [
     {"LOWER": {"REGEX": "whenever"}}
 ]
 departBeforeTimeRegex = [
@@ -104,11 +103,19 @@ arriveBeforeTimeRegex = [
     {"LOWER": {"REGEX": "arrive|arriving"}},
     {"LOWER": {"REGEX": "before"}}
 ]
+dottedTimeWithSpaceMorningRegex = [
+    {"TEXT": {"REGEX": "^(\d)?(\d)(?![\S])"}},
+    {"LOWER": {"REGEX": "a.m."}}
+]
+dottedTimeWithSpaceEveningRegex = [
+    {"TEXT": {"REGEX": "^(\d)?(\d)(?![\S])"}},
+    {"LOWER": {"REGEX": "p.m."}}
+]
 
-# add in a regex for 'from (*)'     and one for 'to (*)' could even add this so I want to BOOK a SINGLE ticket from X to Y?
 # currently 23rd jan works but not 23 jan - i think this is fine?
 # 0am and 0pm are not split by spacy like 1am, etc, so we cannot get specific invalidDate error message
 # currently 1:35 defaults to 1:35am
+
 
 isBooking = ""
 isDelay = ""
@@ -156,6 +163,8 @@ matcher.add("single", [singleRegex])
 matcher.add("return", [returnRegex])
 matcher.add("departBefore", [departBeforeTimeRegex])
 matcher.add("arriveBefore", [arriveBeforeTimeRegex])
+matcher.add("dottedTimeWithSpaceMorning", [dottedTimeWithSpaceMorningRegex])
+matcher.add("dottedTimeWithSpaceEvening", [dottedTimeWithSpaceEveningRegex])
 
 
 def getUserInput(text):
@@ -170,9 +179,8 @@ def getUserInput(text):
     regex_matches = matcher(nlptext)
     for match_id, start, end in regex_matches:
         string_id = nlp.vocab.strings[match_id]  # Get string representation
-        span = nlptext[start:end]  # The matched span
-        print(match_id, string_id, start, end, span.text, "total matches")
-        dictionary[string_id] = span
+        matchedtext = nlptext[start:end]  # The matched text
+        dictionary[string_id] = matchedtext
 
     KEData = {}
     for string_id in dictionary:
@@ -182,16 +190,14 @@ def getUserInput(text):
             KEData["booking"] = "true"
             isBooking = "true"
             text = text.lower()
-            print("here originally")
             if re.search("(?<![\w\d])from(?![\w\d])", text):
                 if re.search("(?<![\w\d])to(?![\w\d])", text):
                     a, b = text.find(' from '), text.find(' to ')
-                    departure = text[a + 6:b]
-                    destination = text[b + 4:]
-                    print("website dep", websiteDeparture)
-                    print("website des", websiteDestination)
-                    websiteDeparture = departure
-                    websiteDestination = destination
+                    if b > a:
+                        departure = text[a + 6:b]
+                        destination = text[b + 4:]
+                        websiteDeparture = departure
+                        websiteDestination = destination
             if "single" in text:
                 KEData["single"] = "true"
                 isReturn = "false"
@@ -449,6 +455,32 @@ def getUserInput(text):
                     websiteTime = time
                 else:
                     KEData["invalidTime"] = "true"
+        elif string_id == "dottedTimeWithSpaceMorning":
+            KEData["dottedTimeWithSpaceMorning"] = "true"
+            time = str(dictionary["dottedTimeWithSpaceMorning"])
+            time = time.replace(" a.m.", "")
+            time = time.zfill(2)
+            if time == "12":
+                time = "00"
+            timeString = time + "00"
+            if validateTime(timeString):
+                websiteTime = timeString
+            else:
+                KEData["invalidTime"] = "true"
+        elif string_id == "dottedTimeWithSpaceEvening":
+            KEData["dottedTimeWithSpaceEvening"] = "true"
+            time = str(dictionary["dottedTimeWithSpaceEvening"])
+            print(time, "time")
+            time = time.replace(" p.m.", "")
+            time = time.zfill(2)
+            if time != "12":
+                time = int(time)
+                time += 12
+            timeString = str(time) + "00"
+            if validateTime(timeString):
+                websiteTime = timeString
+            else:
+                KEData["invalidTime"] = "true"
         elif string_id == "wordTimeMorning":
             KEData["wordTimeMorning"] = "true"
             websiteTime = "0900"
@@ -511,7 +543,6 @@ def getUserInput(text):
 
 def validateTime(string):
     # pass time in format HHMM
-    print("this the time i got bro", string)
     hours = int(string[0:2])
     minutes = int(string[2:4])
     try:

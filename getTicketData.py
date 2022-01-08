@@ -146,7 +146,9 @@ def printTicket(dict1, dict2, cheapestPrice, website):
     extraMinuteString = ""
     andNeeded = True
     exactlyNeeded = False
-
+    pluralForChanges = "s"
+    if str(dict1['changes']) == "1":
+        pluralForChanges = ""
     if str(dict1['durationHours']) == "0":
         andNeeded = False
     elif str(dict1['durationHours']) == "1":
@@ -163,14 +165,14 @@ def printTicket(dict1, dict2, cheapestPrice, website):
 
     if andNeeded:
         timeString = timeString + extraTimeString + " and "  + extraMinuteString + "and has " + str(dict1['changes']) \
-            + " changes.<br>"
+            + " change" + pluralForChanges + ".<br>"
     else:
         if exactlyNeeded:
             timeString = timeString + "exactly " + extraTimeString + "and has " + str(dict1['changes']) \
-                + " changes.<br>"
+                + " change" + pluralForChanges + ".<br>"
         else:
             timeString = timeString + extraTimeString + extraMinuteString + "and has " + str(dict1['changes']) \
-                + " changes.<br>"
+                + " change" + pluralForChanges + ".<br>"
 
     ticket = "------------------------FOR " + websiteDate[0:2] + "/" + websiteDate[2:4] + "/" + websiteDate[4:6] \
              + "-----------------------<br> The cheapest journey departs from " \
