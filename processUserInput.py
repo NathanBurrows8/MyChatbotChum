@@ -115,7 +115,9 @@ dottedTimeWithSpaceEveningRegex = [
 # currently 23rd jan works but not 23 jan - i think this is fine?
 # 0am and 0pm are not split by spacy like 1am, etc, so we cannot get specific invalidDate error message
 # currently 1:35 defaults to 1:35am
-
+# "23rd feb 2023" fires writtenDateShorterMonth, which gives a valid string of 230222 <-- no regex to pick up written
+#      date with a year
+# NationalRail dateTooFarInFuture is always progressing <-- should we code this in?
 
 isBooking = ""
 isDelay = ""
@@ -557,7 +559,7 @@ def validateDate(string):
 
 def isDateTooFarInFuture(string):
     # pass date in format DDMMYY
-    maxDateForNationalRail = datetime.datetime(2022, 3, 30)
+    maxDateForNationalRail = datetime.datetime(2022, 3, 31)
     inputtedDay = string[0:2]
     inputtedMonth = string[2:4]
     inputtedYear = "20" + string[4:6]

@@ -44,13 +44,16 @@
 
 
     "validation_invalid_date": 
-    ["Sorry! I don't quite understand that date. Can you repeat it in a DD/MM/YY format?"],
+    ["Sorry! I don't quite understand that date! Please input it again."],
   
  
     "validation_past_date": 
     ["Sorry, that date is in the past! Please request another date.", "I'm afraid that date is in the past, oops! Please specify another date."],
-  
-  
+
+    "validation_future_date":
+    ["Sorry, that date is too far in the future! National Rail can only book tickets up to 31/03/22. Please enter another date."],
+
+
     "validation_invalid_time": 
     ["Oops! I didnt quite understand that time. Can you repeat it in a HH:MM format?"],
   

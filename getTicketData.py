@@ -100,9 +100,11 @@ def parseData(hasCheapest, website):
         printReturnTicket(dict1, dict2, dict3, dict4, cheapestOutboundPrice, cheapestInboundPrice, website)
     else:
         print("No results were found for the journey - were the locations inputted correctly?")
+        userInterface.send_response("Oops! I couldn't find any results for that journey, please try again."
+        + " I can help you book a train ticket, or predict delays, what would you like me to do?")
         print(website)
 
-
+#todo make return match above function
 def printReturnTicket(dict1, dict2, dict3, dict4, cheapestOutboundPrice, cheapestInboundPrice, website):
     global websiteDate
     print("-----------------------------FOR " + websiteDate[0:2] + "/" + websiteDate[2:4] + "/" + websiteDate[4:6] +

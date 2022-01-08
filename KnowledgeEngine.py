@@ -13,8 +13,24 @@ with open("./static/intents.json") as json_file:
 
 class Bot(KnowledgeEngine):
     #put invalid error catching stuff at the top
+
+
+
+    @Rule(salience=52)
+    def date_in_future(self):
+        if "dateTooFarInFuture" in self.dictionary:
+            userInterface.send_response(random.choice(jsondata["validation_future_date"]))
+            self.declare(Fact(said="date_in_future0"))
+            self.declare(Fact(messageSent="true"))
+
+    @Rule(salience=51)
+    def invalid_date(self):
+        if "invalidDate" in self.dictionary:
+            userInterface.send_response(random.choice(jsondata["validation_invalid_date"]))
+            self.declare(Fact(said="invalid_date"))
+            self.declare(Fact(messageSent="true"))
     @Rule(salience=50)
-    def initialGreeting(self):  # and no strings gathered
+    def initial_greeting(self):  # and no strings gathered
         if "hello" in self.dictionary:
             userInterface.send_response(random.choice(jsondata["hello"]))
             self.declare(Fact(said="hello"))
@@ -68,7 +84,7 @@ class Bot(KnowledgeEngine):
 
     @Rule(NOT(Fact(messageSent="true")),
           salience=45)
-    def completeSingleTicket(self):
+    def complete_single_ticket(self):
         if processUserInput.isBooking == "true":
             if processUserInput.isReturn == "false":
                 if len(processUserInput.websiteDeparture) > 0 and len(processUserInput.websiteDestination) > 0 and \
