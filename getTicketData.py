@@ -104,7 +104,6 @@ def parseData(hasCheapest, website):
         + " I can help you book a train ticket, or predict delays, what would you like me to do?")
         print(website)
 
-#todo make return match above function
 def printReturnTicket(dict1, dict2, dict3, dict4, cheapestOutboundPrice, cheapestInboundPrice, website):
     global websiteDate
     print("-----------------------------FOR " + websiteDate[0:2] + "/" + websiteDate[2:4] + "/" + websiteDate[4:6] +
