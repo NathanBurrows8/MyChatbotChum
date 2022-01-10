@@ -105,43 +105,109 @@ def parseData(hasCheapest, website):
         print(website)
 
 def printReturnTicket(dict1, dict2, dict3, dict4, cheapestOutboundPrice, cheapestInboundPrice, website):
-    global websiteDate
-    print("-----------------------------FOR " + websiteDate[0:2] + "/" + websiteDate[2:4] + "/" + websiteDate[4:6] +
-          "----------------------------")
-    print("The cheapest outbound journey departs from " + str(dict1['departureStationName']) + " at " +
-          str(dict1['departureTime']) + ", and arrives at " + str(dict1['arrivalStationName']) + " at " +
-          str(dict1['arrivalTime']) + ".")
-    print("The journey will take " + str(dict1['durationHours']) + " hours and " + str(dict1['durationMinutes']) +
-          " minutes, and has " + str(dict1['changes']) + " changes.")
-    print("(Journey provided by " + str(dict2['tocName']) + ")")
+    global websiteDate, websiteReturnDate
+    timeString = "This journey will take "
+    extraTimeString = ""
+    extraMinuteString = ""
+    andNeeded = True
+    exactlyNeeded = False
+    pluralForChanges = "s"
+    if str(dict1['changes']) == "1":
+        pluralForChanges = ""
+    if str(dict1['durationHours']) == "0":
+        andNeeded = False
+    elif str(dict1['durationHours']) == "1":
+        extraTimeString = "1 hour "
+    else:
+       extraTimeString = str(dict1['durationHours']) + " hours "
+    if str(dict1['durationMinutes']) == "0":
+        exactlyNeeded = True
+        andNeeded = False
+    elif str(dict1['durationMinutes']) == "1":
+        extraMinuteString = "1 minute, "
+    else:
+        extraMinuteString = str(dict1['durationMinutes']) + " minutes, "
+
+    if andNeeded:
+        timeString = timeString + extraTimeString + " and "  + extraMinuteString + "and has " + str(dict1['changes']) \
+            + " change" + pluralForChanges + ".<br>"
+    else:
+        if exactlyNeeded:
+            timeString = timeString + "exactly " + extraTimeString + "and has " + str(dict1['changes']) \
+                + " change" + pluralForChanges + ".<br>"
+        else:
+            timeString = timeString + extraTimeString + extraMinuteString + "and has " + str(dict1['changes']) \
+                + " change" + pluralForChanges + ".<br>"
+
+    timeString1 = "This journey will take "
+    extraTimeString1 = ""
+    extraMinuteString1 = ""
+    andNeeded1 = True
+    exactlyNeeded1 = False
+    pluralForChanges1 = "s"
+    if str(dict3['changes']) == "1":
+        pluralForChanges1 = ""
+    if str(dict3['durationHours']) == "0":
+        andNeeded1 = False
+    elif str(dict3['durationHours']) == "1":
+        extraTimeString1 = "1 hour "
+    else:
+        extraTimeString1 = str(dict3['durationHours']) + " hours "
+    if str(dict3['durationMinutes']) == "0":
+        exactlyNeeded1 = True
+        andNeeded1 = False
+    elif str(dict3['durationMinutes']) == "1":
+        extraMinuteString1 = "1 minute, "
+    else:
+        extraMinuteString1 = str(dict3['durationMinutes']) + " minutes, "
+
+    if andNeeded1:
+        timeString1 = timeString1 + extraTimeString1 + " and " + extraMinuteString1 + "and has " + str(dict3['changes']) \
+                     + " change" + pluralForChanges1 + ".<br>"
+    else:
+        if exactlyNeeded1:
+            timeString1 = timeString1 + "exactly " + extraTimeString1 + "and has " + str(dict3['changes']) \
+                         + " change" + pluralForChanges1 + ".<br>"
+        else:
+            timeString1 = timeString1 + extraTimeString1 + extraMinuteString1 + "and has " + str(dict3['changes']) \
+                         + " change" + pluralForChanges1 + ".<br>"
+
+    ticket = "------------------------FOR " + websiteDate[0:2] + "/" + websiteDate[2:4] + "/" + websiteDate[4:6] \
+            + "-----------------------<br> The cheapest outbound journey departs from " + str(dict1['departureStationName']) \
+            + " at " + str(dict1['departureTime']) + ", and arrives at " + str(dict1['arrivalStationName']) + " at " \
+            + str(dict1['arrivalTime']) + ".<br> " + timeString + "(Journey provided by " + str(dict2['tocName']) \
+            + ")<br>"
+
+
     if dict1['statusIcon'] == "AMBER_TRIANGLE":
         if dict1['statusMessage'] == "bus service":
-            print("(Some or all of this journey is via bus. Check the booking website for details.)")
+            ticket = ticket + "(Some or all of this journey is via bus. Check the booking website for details.)<br>"
         else:
-            print("(There may be some disruption on this route. Check the booking website for details.)")
-    print("-----------------------------FOR " + websiteReturnDate[0:2] + "/" + websiteReturnDate[2:4] + "/" +
-          websiteReturnDate[4:6] + "----------------------------")
+            ticket = ticket + "(There may be some disruption on this route. Check the booking website for details.) <br>"
+    ticket = ticket + "------------------------FOR " + websiteReturnDate[0:2] + "/" + websiteReturnDate[2:4] + "/" + websiteReturnDate[4:6] \
+            + "-----------------------<br> The cheapest inbound journey departs from " + str(dict3['departureStationName']) \
+            + " at " + str(dict3['departureTime']) + ", and arrives at " + str(dict3['arrivalStationName']) + " at " \
+            + str(dict3['arrivalTime']) + ".<br>" + timeString1 + "(Journey provided by " + str(dict4['tocName']) \
+            + ")<br>"
 
-    print("The cheapest inbound journey departs from " + str(dict3['departureStationName']) + " at " +
-          str(dict3['departureTime']) + ", and arrives at " + str(dict3['arrivalStationName']) + " at " +
-          str(dict3['arrivalTime']) + ".")
-    print("The journey will take " + str(dict3['durationHours']) + " hours and " + str(dict3['durationMinutes']) +
-          " minutes, and has " + str(dict3['changes']) + " changes.")
-    print("(Journey provided by " + str(dict4['tocName']) + ")")
-    if dict3['statusIcon'] == "AMBER_TRIANGLE":
-        if dict3['statusMessage'] == "bus service":
-            print("(Some or all of this journey is via bus. Check the booking website for details.)")
+    if dict1['statusIcon'] == "AMBER_TRIANGLE":
+        if dict1['statusMessage'] == "bus service":
+            ticket = ticket + "(Some or all of this journey is via bus. Check the booking website for details.)<br>"
         else:
-            print("(There may be some disruption on this route. Check the booking website for details.)")
-    print("---------------------------------------------------------------------")
-    print("The ticket will cost £" + f'{cheapestOutboundPrice + cheapestInboundPrice:.2f}' + ". " +
-          "(Outbound = £" + f'{cheapestOutboundPrice:.2f}' + ", Inbound = £" + f'{cheapestOutboundPrice:.2f}' + ")")
+            ticket = ticket + "(There may be some disruption on this route. Check the booking website for details.) <br>"
+
+    ticket = ticket + "<br> This return ticket will cost £" + f'{cheapestOutboundPrice + cheapestInboundPrice:.2f}' \
+             + ". " + "(Outbound = £" + f'{cheapestOutboundPrice:.2f}' + ", Inbound = £" \
+             + f'{cheapestOutboundPrice:.2f}' + ")<br> To view your booking, <a href=\"" + website \
+             + "\" target=\"_blank\"> click here.</a> <br> "
+
+    userInterface.send_response(ticket)
     print(website)
     processUserInput.givenTicket = "true"
 
 
 def printTicket(dict1, dict2, cheapestPrice, website):
-    global websiteDate, websiteReturnDate
+    global websiteDate
     timeString = "The journey will take "
     extraTimeString = ""
     extraMinuteString = ""

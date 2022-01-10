@@ -170,7 +170,8 @@ matcher.add("dottedTimeWithSpaceEvening", [dottedTimeWithSpaceEveningRegex])
 
 
 def getUserInput(text):
-    global websiteDeparture, websiteDestination, isReturn, websiteType, websiteDate, websiteTime, isBooking
+    global websiteDeparture, websiteDestination, isReturn, websiteType, websiteDate, websiteTime, isBooking, websiteReturnType
+
     dictionary = {}
     now = datetime.datetime.now()
 
@@ -219,7 +220,7 @@ def getUserInput(text):
                     if isDateTooFarInFuture(date):
                         KEData["dateTooFarInFuture"] = "true"
                     else:
-                        websiteDate = date
+                        setDate(date)
             else:
                 KEData["invalidDate"] = "true"
         elif string_id == "tomorrow":
@@ -231,7 +232,7 @@ def getUserInput(text):
                     if isDateTooFarInFuture(date):
                         KEData["dateTooFarInFuture"] = "true"
                     else:
-                        websiteDate = date
+                        setDate(date)
             else:
                 KEData["invalidDate"] = "true"
         elif string_id == "day":
@@ -246,7 +247,7 @@ def getUserInput(text):
                     if isDateTooFarInFuture(date):
                         KEData["dateTooFarInFuture"] = "true"
                     else:
-                        websiteDate = date
+                        setDate(date)
             else:
                 KEData["invalidDate"] = "true"
         elif string_id == "slashDateNoYear":
@@ -259,7 +260,7 @@ def getUserInput(text):
                     if isDateTooFarInFuture(date):
                         KEData["dateTooFarInFuture"] = "true"
                     else:
-                        websiteDate = date
+                        setDate(date)
             else:
                 KEData["invalidDate"] = "true"
         elif string_id == "slashDateShorterYear":
@@ -271,7 +272,7 @@ def getUserInput(text):
                     if isDateTooFarInFuture(date):
                         KEData["dateTooFarInFuture"] = "true"
                     else:
-                        websiteDate = date
+                        setDate(date)
             else:
                 KEData["invalidDate"] = "true"
         elif string_id == "writtenDate":
@@ -283,7 +284,7 @@ def getUserInput(text):
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
-                    websiteDate = stringDate
+                    setDate(stringDate)
             except ValueError:
                 KEData["invalidDate"] = "true"
         elif string_id == "writtenDateShorterMonth":
@@ -295,7 +296,7 @@ def getUserInput(text):
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
-                    websiteDate = stringDate
+                    setDate(stringDate)
             except ValueError:
                 KEData["invalidDate"] = "true"
         elif string_id == "writtenDateOf":
@@ -308,7 +309,7 @@ def getUserInput(text):
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
-                    websiteDate = stringDate
+                    setDate(stringDate)
             except ValueError:
                 KEData["invalidDate"] = "true"
         elif string_id == "writtenDateShorterMonthOf":
@@ -321,7 +322,7 @@ def getUserInput(text):
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
-                    websiteDate = stringDate
+                    setDate(stringDate)
             except ValueError:
                 KEData["invalidDate"] = "true"
         elif string_id == "writtenTimeMorning":
@@ -336,7 +337,7 @@ def getUserInput(text):
                 number = str(number).zfill(2)
                 number = number + "00"
                 if validateTime(number):
-                    websiteTime = number
+                    setTime(number)
                 else:
                     KEData["invalidTime"] = "true"
         elif string_id == "writtenTimeEvening":
@@ -350,7 +351,7 @@ def getUserInput(text):
                     number = number + 12
                 number = str(number) + "00"
                 if validateTime(number):
-                    websiteTime = number
+                   setTime(number)
                 else:
                     KEData["invalidTime"] = "true"
         elif string_id == "writtenTimeWithMinutesMorning":
@@ -367,7 +368,7 @@ def getUserInput(text):
                     hour = "00"
                 time = hour.zfill(2) + minutes.zfill(2)
                 if validateTime(time):
-                    websiteTime = time
+                    setTime(time)
                 else:
                     KEData["invalidTime"] = "true"
         elif string_id == "writtenTimeWithMinutesEvening":
@@ -384,7 +385,7 @@ def getUserInput(text):
                     hour = int(hour) + 12
                 time = str(hour).zfill(2) + minutes.zfill(2)
                 if validateTime(time):
-                    websiteTime = time
+                    setTime(time)
                 else:
                     KEData["invalidTime"] = "true"
         elif string_id == "time":
@@ -401,7 +402,7 @@ def getUserInput(text):
                         hour = int(hour) + 12
                     time = str(hour).zfill(2) + minutes.zfill(2)
                     if validateTime(time):
-                        websiteTime = time
+                        setTime(time)
                     else:
                         KEData["invalidTime"] = "true"
             elif "a.m." in text:
@@ -417,7 +418,7 @@ def getUserInput(text):
                         hour = "00"
                     time = str(hour).zfill(2) + minutes.zfill(2)
                     if validateTime(time):
-                        websiteTime = time
+                        setTime(time)
                     else:
                         KEData["invalidTime"] = "true"
             else:
@@ -428,7 +429,7 @@ def getUserInput(text):
                 minutes = time[index + 1:]
                 time = hour.zfill(2) + minutes.zfill(2)
                 if validateTime(time):
-                    websiteTime = time
+                    setTime(time)
                 else:
                     KEData["invalidTime"] = "true"
         elif string_id == "dottedTimeWithSpaceMorning":
@@ -440,7 +441,7 @@ def getUserInput(text):
                 time = "00"
             timeString = time + "00"
             if validateTime(timeString):
-                websiteTime = timeString
+                setTime(timeString)
             else:
                 KEData["invalidTime"] = "true"
         elif string_id == "dottedTimeWithSpaceEvening":
@@ -454,27 +455,27 @@ def getUserInput(text):
                 time += 12
             timeString = str(time) + "00"
             if validateTime(timeString):
-                websiteTime = timeString
+                setTime(timeString)
             else:
                 KEData["invalidTime"] = "true"
         elif string_id == "wordTimeMorning":
             KEData["wordTimeMorning"] = "true"
-            websiteTime = "0900"
+            setTime("0900")
         elif string_id == "wordTimeEvening":
             KEData["wordTimeEvening"] = "true"
-            websiteTime = "1800"
+            setTime("1800")
         elif string_id == "wordTimeAfternoon":
             KEData["wordTimeAfternoon"] = "true"
-            websiteTime = "1300"
+            setTime("1300")
         elif string_id == "wordTimeNoon":
             KEData["wordTimeNoon"] = "true"
-            websiteTime = "1200"
+            setTime("1200")
         elif string_id == "wordTimeMidnight":
             KEData["wordTimeMidnight"] = "true"
-            websiteTime = "0000"
+            setTime("0000")
         elif string_id == "noTimeGiven":
             KEData["noTimeGiven"] = "true"
-            websiteTime = "1000"
+            setTime("1000")
         elif string_id == "arriveBefore":
             KEData["arriveBefore"] = "true"
         elif string_id == "departBefore":
@@ -482,6 +483,28 @@ def getUserInput(text):
 
     if (len(regex_matches) == 0):
         KEData["noMatches"] = "true"
+
+    parseLocations(KEData, text)
+
+
+    if (len(websiteReturnTime) > 0) and (isReturn == "true") and len(websiteReturnType) == 0:
+        parseReturnType(KEData)
+    elif (len(websiteTime) > 0) and len(websiteType) == 0:
+        parseSingleType(KEData)
+
+
+    KEData["userText"] = text
+
+    printStringsDebug()
+
+    KnowledgeEngine.finalResponseText(KEData)
+
+    #todo - new validation - is return date after departure date?
+    #todo - make text-to-speech stop on reload of page
+    #todo - return ticket outbound/inbound are always the same? maybe just get rid of the breakdown?
+
+def parseLocations(KEData, text):
+    global websiteDeparture, websiteDestination
     if len(isReturn) > 0:
         if (len(websiteDestination) == 0) and (len(websiteDeparture) == 0) and "booking" not in KEData:
             if "single" not in KEData and "return" not in KEData:
@@ -493,17 +516,21 @@ def getUserInput(text):
                 else:
                     userInterface.send_response("Sorry, the destination and departure locations cannot be the same!")
 
-    if (len(websiteDestination) > 0) & (isReturn == "false"):
-        # parse time
-        if "departBefore" in KEData:
-            websiteType = "first"
-        elif "arriveBefore" in KEData:
-            websiteType = "arr"
-        else:
-            websiteType = "dep"
+def parseReturnType(KEData):
+    global websiteReturnType
+    if "departBefore" in KEData:
+        websiteReturnType = "first"
+    elif "arriveBefore" in KEData:
+        websiteReturnType = "arr"
 
-    KEData["userText"] = text
+def parseSingleType(KEData):
+    global websiteType
+    if "departBefore" in KEData:
+        websiteType = "first"
+    elif "arriveBefore" in KEData:
+        websiteType = "arr"
 
+def printStringsDebug():
     print("WEBSITE_DEPARTURE", websiteDeparture)
     print("WEBSITE_DESTINATION", websiteDestination)
     print("IS_BOOKING", isBooking)
@@ -511,9 +538,26 @@ def getUserInput(text):
     print("WEBSITE_DATE", websiteDate)
     print("WEBSITE_TIME", websiteTime)
     print("WEBSITE_TYPE", websiteType)
+    print("WEBSITE_RETURN_DATE", websiteReturnDate)
+    print("WEBSITE_RETURN_TIME", websiteReturnTime)
+    print("WEBSITE_RETURN_TYPE", websiteReturnType)
+
+def setDate(date):
+    # pass date as string, in format DDMMYY
+    global websiteDate, websiteReturnDate
+    if len(websiteDate) > 0 and isReturn == "true":
+        websiteReturnDate = date
+    else:
+        websiteDate = date
 
 
-    KnowledgeEngine.finalResponseText(KEData)
+def setTime(time):
+    # pass time as string, in format HHMM
+    global websiteTime, websiteReturnTime
+    if len(websiteTime) > 0 and isReturn == "true":
+        websiteReturnTime = time
+    else:
+        websiteTime = time
 
 
 def parseFromAndTo(text):

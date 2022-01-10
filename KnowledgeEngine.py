@@ -102,8 +102,44 @@ class Bot(KnowledgeEngine):
                     self.declare(Fact(messageSent="true"))
                     processUserInput.resetStrings()
 
+    @Rule(NOT(Fact(messageSent="true")),
+          salience=44)
+    def ask_arrival_date(self):
+        if processUserInput.isReturn == "true":
+            if len(processUserInput.websiteReturnDate) == 0:
+                userInterface.send_response(random.choice(jsondata["question_return_date"]))
+                self.declare(Fact(said="ask_arrival_date"))
+                self.declare(Fact(messageSent="true"))
 
+    @Rule(NOT(Fact(messageSent="true")),
+          salience=43)
+    def ask_arrival_time(self):
+        if len(processUserInput.websiteReturnDate) > 0:
+            if len(processUserInput.websiteReturnTime) == 0:
+                userInterface.send_response(random.choice(jsondata["question_return_time"]))
+                self.declare(Fact(said="ask_arrival_time"))
+                self.declare(Fact(messageSent="true"))
 
+    @Rule(NOT(Fact(messageSent="True")),
+          salience=42)
+    def complete_return_ticket(self):
+        if processUserInput.isBooking == "true":
+            if processUserInput.isReturn == "true":
+                if len(processUserInput.websiteDeparture) > 0 and len(processUserInput.websiteDestination) > 0 and \
+                        len(processUserInput.websiteDate) > 0 and len(processUserInput.websiteTime) > 0 and \
+                        len(processUserInput.websiteReturnDate) > 0 and len(processUserInput.websiteReturnTime) > 0:
+                    if len(processUserInput.websiteType) == 0:
+                        processUserInput.websiteType = "dep"
+                    if len(processUserInput.websiteReturnType) == 0:
+                        processUserInput.websiteReturnType = "dep"
+                    getTicketData.formWebsiteReturn(processUserInput.websiteDeparture,
+                                                    processUserInput.websiteDestination, processUserInput.websiteDate,
+                                                    processUserInput.websiteTime, processUserInput.websiteType,
+                                                    processUserInput.websiteReturnDate,
+                                                    processUserInput.websiteReturnTime,
+                                                    processUserInput.websiteReturnType)
+                    self.declare(Fact(messageSent="true"))
+                    processUserInput.resetStrings()
 
 
 
