@@ -59,7 +59,6 @@ def getData(website):
     # scraping all html
     soup = BeautifulSoup(page.content, 'html.parser')
     price = re.search("(?<=Buy cheapest for £ )(\d?)(\d?)\d.\d\d", str(soup)).group(0)
-    print(price)
     hasCheapest = []
     for item in soup.find_all("td", class_="fare has-cheapest"):
         # getting cheapest fare item from table
@@ -70,7 +69,6 @@ def getData(website):
 
 def parseData(hasCheapest, website, price):
     global page
-    #todo - if len(hasCheapest) = 1 or 0 and isReturn = true, cases not dealt with.
 
     if len(hasCheapest) == 1 and processUserInput.isReturn == "false":
         # single journey
@@ -124,6 +122,7 @@ def parseData(hasCheapest, website, price):
         printReturnTicket(dict1, dict2, dict3, dict4, price, website)
 
     #todo - find a journey that has neither outbound or inbound selected as cheapest, to test a final elif statement
+    #need to find out if the above ^ ever happens?? or if the outbound is always selected at the least
     #elif len(hasCheapest) == 0 and processUserInput.isReturn == "true":
 
     else:
@@ -224,7 +223,7 @@ def printReturnTicket(dict1, dict2, dict3, dict4, price, website):
         else:
             ticket = ticket + "(There may be some disruption on this route. Check the booking website for details.) <br>"
 
-    ticket = ticket + "<br> This return ticket will cost £" + price + "<br> To view your booking, <a href=\""\
+    ticket = ticket + "<br> This return ticket will cost £" + price + ".<br> To view your booking, <a href=\""\
                     + website + "\" target=\"_blank\"> click here.</a> <br> "
 
     userInterface.send_response(ticket)

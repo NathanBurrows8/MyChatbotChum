@@ -1,3 +1,4 @@
+import calendar
 import datetime
 import spacy
 import KnowledgeEngine
@@ -235,6 +236,7 @@ def getUserInput(text):
                 KEData["invalidDate"] = "true"
         elif string_id == "day":
             KEData["day"] = "true"
+            setWeekday(str(dictionary["day"]), KEData)
         elif string_id == "slashDate":
             KEData["slashDate"] = "true"
             date = str(dictionary["slashDate"])
@@ -494,7 +496,6 @@ def getUserInput(text):
 
     KnowledgeEngine.finalResponseText(KEData)
 
-    #todo - return ticket outbound/inbound are always the same? maybe just get rid of the breakdown?
 
 def validateReturnDate(returnDate):
     #pass return date as string, in format DDMMYY
@@ -660,6 +661,26 @@ def resetStrings():
     websiteReturnTime = ""
     websiteReturnType = ""
     givenTicket = ""
+
+def setWeekday(string, KEData):
+    global websiteDate, websiteReturnDate
+    string = string.capitalize()
+    weekdaysNumber = dict(zip(calendar.day_name, range(7)))
+    today = datetime.datetime.now()
+    todaysNumber = today.weekday()
+    difference = (weekdaysNumber[string] - todaysNumber)
+    if difference <= 0:
+        difference += 7
+    date = today + datetime.timedelta(days=difference)
+    dateString = str(date.day).zfill(2) + str(date.month).zfill(2) + str(date.year)[2:4]
+    if len(websiteDate) > 0 and isReturn == "true":
+        if validateReturnDate(dateString):
+            websiteReturnDate = dateString
+        else:
+            KEData["outgoingDateBeforeIncoming"] = "true"
+    else:
+        websiteDate = dateString
+
 
 # verify named entity as location/dummy ticket purchase before moving on to the next step? so user can instantly
 # try another location?
