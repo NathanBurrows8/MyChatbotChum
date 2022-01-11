@@ -216,11 +216,10 @@ def getUserInput(text):
             KEData["today"] = "true"
             date = str(now.day).zfill(2) + str(now.month).zfill(2) + str(now.year)[2:4]
             if validateDate(date):
-                if isReturn == "false":
-                    if isDateTooFarInFuture(date):
-                        KEData["dateTooFarInFuture"] = "true"
-                    else:
-                        setDate(date)
+                if isDateTooFarInFuture(date):
+                    KEData["dateTooFarInFuture"] = "true"
+                else:
+                    setDate(date, KEData)
             else:
                 KEData["invalidDate"] = "true"
         elif string_id == "tomorrow":
@@ -228,11 +227,10 @@ def getUserInput(text):
             tomorrow = now + datetime.timedelta(days=1)
             date = str(tomorrow.day).zfill(2) + str(tomorrow.month).zfill(2) + str(tomorrow.year)[2:4]
             if validateDate(date):
-                if isReturn == "false":
-                    if isDateTooFarInFuture(date):
-                        KEData["dateTooFarInFuture"] = "true"
-                    else:
-                        setDate(date)
+                if isDateTooFarInFuture(date):
+                    KEData["dateTooFarInFuture"] = "true"
+                else:
+                    setDate(date, KEData)
             else:
                 KEData["invalidDate"] = "true"
         elif string_id == "day":
@@ -243,11 +241,10 @@ def getUserInput(text):
             date = date.replace("/", "")
             date = date[0:4] + date[6:8]
             if validateDate(date):
-                if isReturn == "false":  # need to add return functionality to these
-                    if isDateTooFarInFuture(date):
-                        KEData["dateTooFarInFuture"] = "true"
-                    else:
-                        setDate(date)
+                if isDateTooFarInFuture(date):
+                    KEData["dateTooFarInFuture"] = "true"
+                else:
+                    setDate(date, KEData)
             else:
                 KEData["invalidDate"] = "true"
         elif string_id == "slashDateNoYear":
@@ -256,11 +253,10 @@ def getUserInput(text):
             date = date.replace("/", "")
             date = date + str(now.year)[2:4]
             if validateDate(date):
-                if isReturn == "false":
-                    if isDateTooFarInFuture(date):
-                        KEData["dateTooFarInFuture"] = "true"
-                    else:
-                        setDate(date)
+                if isDateTooFarInFuture(date):
+                    KEData["dateTooFarInFuture"] = "true"
+                else:
+                    setDate(date, KEData)
             else:
                 KEData["invalidDate"] = "true"
         elif string_id == "slashDateShorterYear":
@@ -268,11 +264,10 @@ def getUserInput(text):
             date = str(dictionary["slashDateShorterYear"])
             date = date.replace("/", "")
             if validateDate(date):
-                if isReturn == "false":
-                    if isDateTooFarInFuture(date):
-                        KEData["dateTooFarInFuture"] = "true"
-                    else:
-                        setDate(date)
+                if isDateTooFarInFuture(date):
+                    KEData["dateTooFarInFuture"] = "true"
+                else:
+                    setDate(date, KEData)
             else:
                 KEData["invalidDate"] = "true"
         elif string_id == "writtenDate":
@@ -284,7 +279,7 @@ def getUserInput(text):
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
-                    setDate(stringDate)
+                    setDate(stringDate, KEData)
             except ValueError:
                 KEData["invalidDate"] = "true"
         elif string_id == "writtenDateShorterMonth":
@@ -296,7 +291,7 @@ def getUserInput(text):
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
-                    setDate(stringDate)
+                    setDate(stringDate, KEData)
             except ValueError:
                 KEData["invalidDate"] = "true"
         elif string_id == "writtenDateOf":
@@ -309,7 +304,7 @@ def getUserInput(text):
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
-                    setDate(stringDate)
+                    setDate(stringDate, KEData)
             except ValueError:
                 KEData["invalidDate"] = "true"
         elif string_id == "writtenDateShorterMonthOf":
@@ -322,7 +317,7 @@ def getUserInput(text):
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
-                    setDate(stringDate)
+                    setDate(stringDate, KEData)
             except ValueError:
                 KEData["invalidDate"] = "true"
         elif string_id == "writtenTimeMorning":
@@ -499,9 +494,24 @@ def getUserInput(text):
 
     KnowledgeEngine.finalResponseText(KEData)
 
-    #todo - new validation - is return date after departure date?
-    #todo - make text-to-speech stop on reload of page
     #todo - return ticket outbound/inbound are always the same? maybe just get rid of the breakdown?
+
+def validateReturnDate(returnDate):
+    #pass return date as string, in format DDMMYY
+    global websiteDate
+    outboundDay = websiteDate[0:2]
+    outboundMonth = websiteDate[2:4]
+    outboundYear = "20" + websiteDate[4:6]
+    inboundDay = returnDate[0:2]
+    inboundMonth = returnDate[2:4]
+    inboundYear = "20" + returnDate[4:6]
+
+    outboundDate = outboundDay + "/" + outboundMonth + "/" + outboundYear
+    outboundDateTime = datetime.datetime.strptime(outboundDate, "%d/%m/%Y")
+    inboundDate = inboundDay + "/" + inboundMonth + "/" + inboundYear
+    inboundDateTime = datetime.datetime.strptime(inboundDate, "%d/%m/%Y")
+
+    return outboundDateTime <= inboundDateTime
 
 def parseLocations(KEData, text):
     global websiteDeparture, websiteDestination
@@ -542,11 +552,14 @@ def printStringsDebug():
     print("WEBSITE_RETURN_TIME", websiteReturnTime)
     print("WEBSITE_RETURN_TYPE", websiteReturnType)
 
-def setDate(date):
+def setDate(date, KEData):
     # pass date as string, in format DDMMYY
     global websiteDate, websiteReturnDate
     if len(websiteDate) > 0 and isReturn == "true":
-        websiteReturnDate = date
+        if validateReturnDate(date):
+            websiteReturnDate = date
+        else:
+            KEData["outgoingDateBeforeIncoming"] = "true"
     else:
         websiteDate = date
 
@@ -606,7 +619,7 @@ def validateDate(string):
         fullInputtedDateTime = datetime.datetime.strptime(fullInputtedDate, "%d/%m/%Y")
     except ValueError:
         return False
-    return fullInputtedDateTime.date() > today.date()
+    return fullInputtedDateTime.date() >= today.date()
 
 
 def isDateTooFarInFuture(string):

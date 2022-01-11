@@ -132,6 +132,7 @@ function volumeButtonClicked() {
     else {
         volumeIcon.src = "/static/volume_off.png";
         volume = 0;
+        speechSynthesis.cancel()
     }
 
 }

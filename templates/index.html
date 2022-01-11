@@ -18,6 +18,7 @@
           });
           if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
               socket.emit('page_reload', 200);
+              speechSynthesis.cancel()
           }
       </script>
   </head>

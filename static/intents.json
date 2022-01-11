@@ -64,6 +64,10 @@
   
     "error_no_tickets": 
     ["My apologies, we could not find any results for this journey.", "Sorry, there are no tickets available for this journey"],
+
+
+    "outgoing_date_before_incoming":
+    ["Sorry, that return date is before your departure date! Please enter your return date again."],
   
    
     "after_ticket_sent": 
