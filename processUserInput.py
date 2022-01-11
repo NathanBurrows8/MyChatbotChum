@@ -522,7 +522,7 @@ def parseLocations(KEData, text):
                 websiteDeparture = text
         elif (len(websiteDeparture) > 0) and (len(websiteDestination) == 0) and "booking" not in KEData:
             if "single" not in KEData and "return" not in KEData:
-                if websiteDeparture != text:
+                if websiteDeparture.lower() != text.lower():
                     websiteDestination = text
                 else:
                     userInterface.send_response("Sorry, the destination and departure locations cannot be the same!")
