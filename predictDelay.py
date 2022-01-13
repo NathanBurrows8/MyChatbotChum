@@ -3,6 +3,7 @@ import requests
 
 api_AllTrains = "https://hsp-prod.rockshore.net/api/v1/serviceMetrics"
 api_SpecificTrain = "https://hsp-prod.rockshore.net/api/v1/serviceDetails"
+
 #use top API to get train RIDS of certain route, then get specific data on each one with the bottom API
 #need some CRS code validation? maybe refuse to go further in conversation without CRS code match
 headers = { "Content-Type": "application/json" }
@@ -21,13 +22,14 @@ def getTrainRIDS(departureCode, arrivalCode, departureTime, arrivalTime, departu
       "days": "WEEKDAY"
     }
     r = requests.post(api_AllTrains, headers=headers, auth=auths, json=data)
+    print(r)
     services = r.json().get("Services")
     ridList = []
     if services:
         for rid in services:
             individualTrain = rid.get("serviceAttributesMetrics").get("rids")
             for train in individualTrain:
-                ridList.append(train)
+                ridList.append(str(train))
         return ridList
     else:
         return False #error handle this
@@ -43,6 +45,6 @@ def getDataFromRID(rid):
 
 if "__main__" == __name__:
     #this may take a little while
-    #print(getTrainRIDS("NRW", "LST", "0700", "0800", "2016-07-01", "2016-08-01"))
-    print(getDataFromRID("201607043432691"))
-
+    ridList = getTrainRIDS("NRW", "LST", "0700", "0800", "2016-07-01", "2016-07-11")
+    for rid in ridList:
+        print(getDataFromRID(rid))
