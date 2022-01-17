@@ -71,7 +71,29 @@
   
    
     "after_ticket_sent": 
-    ["Do you want to book another ticket or see potential train delays?", "Now, do you want to book a different ticket or see potential train delays?"]
+    ["Do you want to book another ticket or see potential train delays?", "Now, do you want to book a different ticket or see potential train delays?"],
+
+
+    "question_departure_station_delay":
+    ["What station did you depart from?"],
+
+    "question_destination_station_delay":
+    ["What station are you going to?"],
+
+    "question_current_station_delay":
+    ["What station are you currently at?"],
+
+    "question_delay_time":
+    ["How long is your quoted delay time, in minutes?"],
+
+    "validation_no_station_found":
+    ["Sorry, I can only predict a delay if I am given a valid station! Please specify again."],
+
+    "validation_duplicate_station":
+    ["Sorry, you cannot choose this station! Please specify again."],
+
+    "validation_unable_to_parse_time":
+    ["Apologies, I could not quite understand that time! Please state it again."]
   }
 
 

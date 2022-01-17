@@ -4,6 +4,8 @@ import spacy
 import KnowledgeEngine
 from spacy.matcher import Matcher
 import re
+
+import getTicketData
 import userInterface
 
 helloRegex = [
@@ -134,6 +136,11 @@ websiteReturnDate = ""
 websiteReturnTime = ""
 websiteReturnType = ""
 
+delayDepartureStation = ""
+delayDestinationStation = ""
+delayTimeFromUser = ""
+delayStationUserIsAt = ""
+
 nlp = spacy.load("en_core_web_sm")
 
 matcher = Matcher(nlp.vocab)
@@ -203,6 +210,7 @@ def getUserInput(text):
                 isReturn = "true"
         elif string_id == "delay":
             KEData["delay"] = "true"
+            isBooking = "false"
         elif string_id == "single":
             KEData["single"] = "true"
             parseFromAndTo(text)
@@ -481,7 +489,14 @@ def getUserInput(text):
     if (len(regex_matches) == 0):
         KEData["noMatches"] = "true"
 
-    parseLocations(KEData, text)
+    if isBooking == "true":
+        parseLocations(KEData, text)
+    elif isBooking == "false":
+        if len(delayStationUserIsAt) == 0:
+            parseDelayLocations(KEData, text)
+        else:
+            parseDelayTime(KEData, text)
+
 
 
     if (len(websiteReturnTime) > 0) and (isReturn == "true") and len(websiteReturnType) == 0:
@@ -496,6 +511,13 @@ def getUserInput(text):
 
     KnowledgeEngine.finalResponseText(KEData)
 
+def parseDelayTime(KEData, text):
+    global delayTimeFromUser
+    try:
+        delayTimeFromUser = re.search("\d+", text).group()
+        KEData["readyToCalculate"] = "true"
+    except Exception:
+        KEData["invalidDelayTime"] = "true"
 
 def validateReturnDate(returnDate):
     #pass return date as string, in format DDMMYY
@@ -513,6 +535,42 @@ def validateReturnDate(returnDate):
     inboundDateTime = datetime.datetime.strptime(inboundDate, "%d/%m/%Y")
 
     return outboundDateTime <= inboundDateTime
+
+def parseDelayLocations(KEData, text):
+    global delayDestinationStation, delayDepartureStation, delayStationUserIsAt
+    if len(delayStationUserIsAt) == 0:
+        if len(delayDepartureStation) == 0 and "delay" not in KEData:
+            station = getTicketData.searchForSingleStation(text)
+            if not station:
+                KEData["noStationFound"] = "true"
+            else:
+                delayDepartureStation = station
+                KEData["delayDepartureFound"] = "true"
+
+        elif len(delayDestinationStation) > 0 and "delay" not in KEData:
+            station = getTicketData.searchForSingleStation(text)
+            if station == False:
+                KEData["noStationFound"] = "true"
+            else:
+                if station != delayDepartureStation and station != delayDestinationStation:
+                    delayStationUserIsAt = station
+                    KEData["stationFound"] = "true"
+                else:
+                    KEData["duplicateStation"] = "true"
+
+        elif len(delayDepartureStation) > 0 and "delay" not in KEData:
+            station = getTicketData.searchForSingleStation(text)
+            if not station:
+                KEData["noStationFound"] = "true"
+            else:
+                if station != delayDepartureStation:
+                    delayDestinationStation = station
+                    KEData["delayDestinationFound"] = "true"
+                else:
+                    KEData["duplicateStation"] = "true"
+
+
+
 
 def parseLocations(KEData, text):
     global websiteDeparture, websiteDestination
@@ -552,6 +610,10 @@ def printStringsDebug():
     print("WEBSITE_RETURN_DATE", websiteReturnDate)
     print("WEBSITE_RETURN_TIME", websiteReturnTime)
     print("WEBSITE_RETURN_TYPE", websiteReturnType)
+    print("DELAY_DEPARTURE", delayDepartureStation)
+    print("DELAY_DESTINATION", delayDestinationStation)
+    print("DELAY_STATION", delayStationUserIsAt)
+    print("DELAY_TIME_USER", delayTimeFromUser)
 
 def setDate(date, KEData):
     # pass date as string, in format DDMMYY
@@ -648,7 +710,8 @@ def datetimeToString(date):
 
 def resetStrings():
     global websiteDeparture, websiteDestination, websiteDate, websiteTime, websiteType, websiteReturnDate, \
-        websiteReturnTime, websiteReturnType, isBooking, isReturn, isDelay, givenTicket
+        websiteReturnTime, websiteReturnType, isBooking, isReturn, isDelay, givenTicket, delayDestinationStation, \
+        delayDepartureStation, delayStationUserIsAt, delayTimeFromUser
     isBooking = ""
     isReturn = ""
     isDelay = ""
@@ -661,6 +724,10 @@ def resetStrings():
     websiteReturnTime = ""
     websiteReturnType = ""
     givenTicket = ""
+    delayStationUserIsAt = ""
+    delayTimeFromUser = ""
+    delayDestinationStation = ""
+    delayDepartureStation = ""
 
 def setWeekday(string, KEData):
     global websiteDate, websiteReturnDate

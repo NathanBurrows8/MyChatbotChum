@@ -1,5 +1,5 @@
 import re
-
+import string
 import requests
 import csv
 import json
@@ -22,7 +22,6 @@ def searchForLocations(websiteDeparture, websiteDestination):
     except Exception as e:
         print("{No specific station found for '" + websiteDeparture +
               "'. Attempting to search using the location instead..}")
-        pass
 
     try:
         websiteDestination = stationCodes[websiteDestination]
@@ -30,6 +29,19 @@ def searchForLocations(websiteDeparture, websiteDestination):
         print("{No specific station found for '" + websiteDestination +
               "'. Attempting to search using the location instead..}")
     return websiteDeparture, websiteDestination
+
+def searchForSingleStation(text):
+    stationCodes = {}
+    reader = csv.reader(open("static/crs_codes.csv"))
+    for row in reader:
+        key = row[0]
+        stationCodes[key] = row[1]
+    try:
+        temp = stationCodes[string.capwords(text)]
+    except KeyError as e:
+        return False
+    return temp
+
 
 
 def formWebsiteReturn(websiteDeparture, websiteDestination, siteDate, websiteTime, websiteType, siteReturnDate, websiteReturnTime, websiteReturnType):

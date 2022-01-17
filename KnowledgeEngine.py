@@ -5,6 +5,7 @@ import random
 from experta import *
 import json
 import getTicketData
+import predictDelay
 import userInterface
 import processUserInput
 
@@ -12,6 +13,28 @@ with open("./static/intents.json") as json_file:
     jsondata = json.load(json_file)
 
 class Bot(KnowledgeEngine):
+
+    @Rule(salience=57)
+    def unable_to_parse_time(self):
+        if "invalidDelayTime" in self.dictionary:
+            userInterface.send_response(random.choice(jsondata["validation_unable_to_parse_time"]))
+            self.declare(Fact(said="invalid_delay_time"))
+            self.declare(Fact(messageSent="true"))
+
+    @Rule(salience=56)
+    def station_not_found_delay(self):
+        if "noStationFound" in self.dictionary:
+            userInterface.send_response(random.choice(jsondata["validation_no_station_found"]))
+            self.declare(Fact(said="no_station_found"))
+            self.declare(Fact(messageSent="true"))
+
+
+    @Rule(salience=55)
+    def duplicate_station_delay(self):
+        if "duplicateStation" in self.dictionary:
+            userInterface.send_response(random.choice(jsondata["validation_duplicate_station"]))
+            self.declare(Fact(said="duplicate_station_delay"))
+            self.declare(Fact(messageSent="true"))
 
     @Rule(salience=54)
     def outgoing_date_before_incoming(self):
@@ -127,7 +150,7 @@ class Bot(KnowledgeEngine):
                 self.declare(Fact(said="ask_arrival_time"))
                 self.declare(Fact(messageSent="true"))
 
-    @Rule(NOT(Fact(messageSent="True")),
+    @Rule(NOT(Fact(messageSent="true")),
           salience=42)
     def complete_return_ticket(self):
         if processUserInput.isBooking == "true":
@@ -148,6 +171,46 @@ class Bot(KnowledgeEngine):
                     self.declare(Fact(messageSent="true"))
                     processUserInput.resetStrings()
 
+    @Rule(NOT(Fact(messageSent="true")),
+          salience=41)
+    def ask_departure_station_delay(self):
+        if "delay" in self.dictionary:
+            if len(processUserInput.delayDestinationStation) == 0:
+                userInterface.send_response(random.choice(jsondata["question_departure_station_delay"]))
+                self.declare(Fact(messageSent="true"))
+                self.declare(Fact(said="ask_departure_station_delay"))
+
+    @Rule(NOT(Fact(messageSent="true")),
+          salience=40)
+    def ask_destination_station_delay(self):
+        if len(processUserInput.delayDepartureStation) > 0 and len(processUserInput.delayDestinationStation) == 0:
+            userInterface.send_response(random.choice(jsondata["question_destination_station_delay"]))
+            self.declare(Fact(messageSent="true"))
+            self.declare(Fact(said="ask_destination_station_delay"))
+
+    @Rule(NOT(Fact(messageSent="true")),
+          salience=39)
+    def ask_current_station_delay(self):
+        if len(processUserInput.delayDestinationStation) > 0 and len(processUserInput.delayStationUserIsAt) == 0:
+            userInterface.send_response(random.choice(jsondata["question_current_station_delay"]))
+            self.declare(Fact(messageSent="true"))
+            self.declare(Fact(said="ask_current_station_delay"))
+
+    @Rule(NOT(Fact(messageSent="true")),
+          salience=38)
+    def ask_delay_time(self):
+        if len(processUserInput.delayStationUserIsAt) > 0 and len(processUserInput.delayTimeFromUser) == 0:
+            userInterface.send_response(random.choice(jsondata["question_delay_time"]))
+            self.declare(Fact(messageSent="true"))
+            self.declare(Fact(said="ask_delay_time"))
+
+    @Rule(NOT(Fact(messageSent="true")),
+          salience=37)
+    def calculate_delay(self):
+        if "readyToCalculate" in self.dictionary:
+            predictDelay.predict(processUserInput.delayDepartureStation, processUserInput.delayDestinationStation,
+                                    processUserInput.delayStationUserIsAt, int(processUserInput.delayTimeFromUser))
+            self.declare(Fact(messageSent="true"))
 
 
     @Rule(NOT(Fact(messageSent="true")),
@@ -163,7 +226,6 @@ def finalResponseText(nlp):
     bot.dictionary = nlp
     print(nlp)
     bot.reset()
-    watch('RULES')
     bot.run()
 
 

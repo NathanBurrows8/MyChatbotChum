@@ -4,6 +4,9 @@ import datetime
 from sklearn.neural_network import MLPRegressor
 import numpy as np
 
+import processUserInput
+import userInterface
+
 api_AllTrains = "https://hsp-prod.rockshore.net/api/v1/serviceMetrics"
 api_SpecificTrain = "https://hsp-prod.rockshore.net/api/v1/serviceDetails"
 
@@ -11,6 +14,8 @@ api_SpecificTrain = "https://hsp-prod.rockshore.net/api/v1/serviceDetails"
 #need some CRS code validation? maybe refuse to go further in conversation without CRS code match
 headers = { "Content-Type": "application/json" }
 auths = ("nathanburrows68@gmail.com", "Jwc2dY4q4M2i!!8")
+
+delayAtStation = ""
 
 #this is the history of a train route between certain times
 def getTrainRIDS(departureCode, arrivalCode, departureTime, arrivalTime, departureDate, arrivalDate):
@@ -24,7 +29,7 @@ def getTrainRIDS(departureCode, arrivalCode, departureTime, arrivalTime, departu
       "to_date": arrivalDate,
       "days": "WEEKDAY"
     }
-    print("Getting train data...")
+    userInterface.send_response("Getting train data...")
     r = requests.post(api_AllTrains, headers=headers, auth=auths, json=data)
     services = r.json().get("Services")
     ridList = []
@@ -47,60 +52,78 @@ def getDataFromRID(rid):
     return trainData
 
 def predict(departureCode, arrivalCode, stationCode, delayInMinutes):
-    ridList = getTrainRIDS(departureCode, arrivalCode, "0700", "0800", "2016-07-01", "2016-08-01")
-    inputArray = []
-    trainDataList = []
-    for rid in ridList:
-        trainDataList.append(getDataFromRID(rid))
+    global delayAtStation
+    ridList = getTrainRIDS(departureCode, arrivalCode, "0700", "0800", "2016-07-01", "2016-07-27")
+    if ridList is not False:
+        inputArray = []
+        trainDataList = []
+        for rid in ridList:
+            trainDataList.append(getDataFromRID(rid))
 
-    location_list = []
-    for i in trainDataList:
-        location_list.append(i['serviceAttributesDetails']['locations'])
+        location_list = []
+        for i in trainDataList:
+            location_list.append(i['serviceAttributesDetails']['locations'])
 
-    if len(location_list) == 0:
-        print("Error")
+        if len(location_list) == 0:
+            userInterface.send_response("Sorry, I cant find any train IDs for that route. "
+                                        "Want me to predict another route, or book a train ticket?")
+            processUserInput.resetStrings()
+        else:
+            for i in location_list:
+                for j in i:
+                    if j['location'] == stationCode:
+                        expectedDep = j['gbtt_ptd']
+                        if len(expectedDep) == 0:
+                            break
+                        expectedDepTime = datetime.datetime.strptime(expectedDep[0:2] + ":" + expectedDep[2:4], '%H:%M')
+                        actualDep = j['actual_td']
+                        if len(actualDep) == 0:
+                            break
+                        actualDepTime = datetime.datetime.strptime(actualDep[0:2] + ":" + actualDep[2:4], '%H:%M')
+                        if actualDepTime < expectedDepTime:
+                            actualDepTime = expectedDepTime
+                        delayAtStation = int((actualDepTime - expectedDepTime).seconds / 60)    #in minutes
+
+                    elif j['location'] == arrivalCode and len(str(delayAtStation)) != 0:
+                        if len(str(delayAtStation)) != 0:
+                            expectedDep = j['gbtt_pta']
+                            if len(expectedDep) == 0:
+                                break
+                            expectedDepTime = datetime.datetime.strptime(expectedDep[0:2] + ":" + expectedDep[2:4], '%H:%M')
+                            actualDep = j['actual_ta']
+                            if len(actualDep) == 0:
+                                break
+                            actualDepTime = datetime.datetime.strptime(actualDep[0:2] + ":" + actualDep[2:4], '%H:%M')
+                            if actualDepTime < expectedDepTime:
+                                actualDepTime = expectedDepTime
+                            delayAtArrival = int((actualDepTime - expectedDepTime).seconds / 60)    #in minutes
+                            inputArray.append([delayAtStation, delayAtArrival])
+                        else:
+                            userInterface.send_response("Sorry, it doesn't seem like this route was valid. "
+                                                        "Want me to predict another route, or book a train ticket?")
+                            processUserInput.resetStrings()
+
+
+        arr = np.array(inputArray)
+        userInterface.send_response("Predicting delay...")
+        try:
+            nn = MLPRegressor(max_iter=6000).fit(arr[:, :-1], arr[:, -1])
+            prediction = nn.predict([[delayInMinutes]])[0]
+        except Exception:
+            userInterface.send_response("Sorry, I can't find the station you're at on this route. Want me to predict another delay, or book a train ticket?")
+            processUserInput.resetStrings()
+        print("PREDICTION", prediction)
+        prediction = int(prediction)
+        if prediction < 1:
+            userInterface.send_response("Good news! You are still expected to arrive on time. Thanks for using our service.")
+        elif prediction == 1:
+            userInterface.send_response("I predict that you will be just 1 minute late to your destination. Thanks for using our service.")
+        else:
+            userInterface.send_response("I predict that you will be " + str(prediction) + " minutes late to your destination. Thanks for using our service.")
+        processUserInput.resetStrings()
     else:
-        for i in location_list:
-            for j in i:
-                if j['location'] == stationCode:
-                    expectedDep = j['gbtt_ptd']
-                    if len(expectedDep) == 0:
-                        break
-                    expectedDepTime = datetime.datetime.strptime(expectedDep[0:2] + ":" + expectedDep[2:4], '%H:%M')
-                    actualDep = j['actual_td']
-                    if len(actualDep) == 0:
-                        break
-                    actualDepTime = datetime.datetime.strptime(actualDep[0:2] + ":" + actualDep[2:4], '%H:%M')
-                    if actualDepTime < expectedDepTime:
-                        actualDepTime = expectedDepTime
-                    delayAtStation = int((actualDepTime - expectedDepTime).seconds / 60)    #in minutes
-
-                elif j['location'] == arrivalCode and len(str(delayAtStation)) != 0:
-                    expectedDep = j['gbtt_pta']
-                    if len(expectedDep) == 0:
-                        break
-                    expectedDepTime = datetime.datetime.strptime(expectedDep[0:2] + ":" + expectedDep[2:4], '%H:%M')
-                    actualDep = j['actual_ta']
-                    if len(actualDep) == 0:
-                        break
-                    actualDepTime = datetime.datetime.strptime(actualDep[0:2] + ":" + actualDep[2:4], '%H:%M')
-                    if actualDepTime < expectedDepTime:
-                        actualDepTime = expectedDepTime
-                    delayAtArrival = int((actualDepTime - expectedDepTime).seconds / 60)    #in minutes
-                    inputArray.append([delayAtStation, delayAtArrival])
-
-    arr = np.array(inputArray)
-    print("Predicting delay...")
-    nn = MLPRegressor(max_iter=5000).fit(arr[:, :-1], arr[:, -1])
-    prediction = nn.predict([[delayInMinutes]])
-    return prediction
-
-if "__main__" == __name__:
-    #print a prediction of the train from norwich to london - im at ipswich, and there has been a 2 minute delay announced
-    print(predict("NRW", "LST", "IPS", 2))
-
-
+        userInterface.send_response("Sorry, I couldn't find any results for this journey. Want me to predict another route, or book a train ticket?")
+        processUserInput.resetStrings()
 
 
 #INPUT: delay at specific station (actual dep - expected dep)   OUTPUT: delay at last station (actual arr - expected arr)
-#if prediction < 1, then we do not predict any extra delays as well as what was already announced
