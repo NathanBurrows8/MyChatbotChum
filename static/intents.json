@@ -51,7 +51,7 @@
     ["Sorry, that date is in the past! Please request another date.", "I'm afraid that date is in the past, oops! Please specify another date."],
 
     "validation_future_date":
-    ["Sorry, that date is too far in the future! National Rail can only book tickets up to 31/03/22. Please enter another date."],
+    ["Sorry, that date is too far in the future for the National Rail website to support! Please enter a closer date."],
 
 
     "validation_invalid_time": 
