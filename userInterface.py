@@ -9,27 +9,28 @@ app.debug = True
 
 
 @app.route("/")
-def get_data():
+def get_data(): #display index.html as the webpage
     return render_template('index.html')
 
 
 socketio = SocketIO(app, cors_allowed_origins='*')
 
+# when the page first connects, display the robot's intro message
 @socketio.on("connect")
 def intro():
     send_response(KnowledgeEngine.getIntroText())
 
-# using websockets to send data between javascript and python
+# using websockets to send the users message from javascript to python. This input is processed via processUserInput
 @socketio.on("message_from_javascript")
 def handle_message(data):
     processUserInput.getUserInput(data)
 
-
+# when the page reloads/refreshes, reset the varaibles thus resetting the conversation
 @socketio.on("page_reload")
 def reload(data):
     processUserInput.resetStrings()
 
-
+# using websockets to send the final robot response from python to javascript
 def send_response(text):
     socketio.emit("message_from_python", text)
 

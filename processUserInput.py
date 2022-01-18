@@ -1,3 +1,5 @@
+#this file mainly concerns labelling the users input text into certain groups (is it a date, time, location etc...)
+#based on this label then certain actions can be taken
 import calendar
 import datetime
 import spacy
@@ -8,6 +10,7 @@ import re
 import getTicketData
 import userInterface
 
+#using SpaCy to match regex. LOWER = make text lowercase. TEXT = exact match.
 helloRegex = [
     {"LOWER": {"REGEX": "hi(?![\S])|hey(?![\S])|yo(?![\S])|hello(?![\S])"}}
 ]
@@ -115,6 +118,7 @@ dottedTimeWithSpaceEveningRegex = [
     {"LOWER": {"REGEX": "p.m."}}
 ]
 
+#   Regex Notes:
 # currently 23rd jan works but not 23 jan - i think this is fine?
 # 0am and 0pm are not split by spacy like 1am, etc, so we cannot get specific invalidDate error message
 # currently 1:35 defaults to 1:35am
@@ -122,6 +126,7 @@ dottedTimeWithSpaceEveningRegex = [
 #      date with a year
 # NationalRail dateTooFarInFuture is always progressing <-- should we code this in?
 
+#these are the variables that the bot needs to make a valid request to National Rail or the MLPRegressor
 isBooking = ""
 isDelay = ""
 websiteDeparture = ""
@@ -143,6 +148,7 @@ delayStationUserIsAt = ""
 
 nlp = spacy.load("en_core_web_sm")
 
+#loading in all of the previous regex into a SpaCy matcher, that runs on every message sent by the user labelling it
 matcher = Matcher(nlp.vocab)
 matcher.add("hello", [helloRegex])
 matcher.add("goodbye", [goodbyeRegex])
@@ -183,9 +189,9 @@ def getUserInput(text):
     dictionary = {}
     now = datetime.datetime.now()
 
-    nlptext = nlp(text)
+    nlptext = nlp(text)     #tokenising text
     for token in nlptext:
-        print(token.text, token.pos_, token.dep_)
+        print(token.text, token.pos_, token.dep_) #printing NLP text for debugging in console
 
     regex_matches = matcher(nlptext)
     for match_id, start, end in regex_matches:
@@ -193,9 +199,10 @@ def getUserInput(text):
         matchedtext = nlptext[start:end]  # The matched text
         dictionary[string_id] = matchedtext
 
-    KEData = {}
+    KEData = {} #this dictionary will be passed to the KE later
     for string_id in dictionary:
-        #08-01-22 : this elif statement is 319 lines long
+        #depending on what label the text has, different actions will be taken. Date needs to be a DDMMYY string,
+        #Time needs to be an HHMM string etc..
         if string_id == "hello":
             KEData["hello"] = "true"
         elif string_id == "booking":
@@ -505,13 +512,14 @@ def getUserInput(text):
         parseSingleType(KEData)
 
 
-    KEData["userText"] = text
+    KEData["userText"] = text       # the entire user message is also added to the KE's dictionary
 
     printStringsDebug()
 
-    KnowledgeEngine.finalResponseText(KEData)
+    KnowledgeEngine.finalResponseText(KEData)   # calling the knowledge engine, the final step in the process
 
 def parseDelayTime(KEData, text):
+    #getting an integer when the user is prompted to enter a delay time in minutes
     global delayTimeFromUser
     try:
         delayTimeFromUser = re.search("\d+", text).group()
@@ -520,6 +528,7 @@ def parseDelayTime(KEData, text):
         KEData["invalidDelayTime"] = "true"
 
 def validateReturnDate(returnDate):
+    #making sure the return date is a valid date, and after the outbound date
     #pass return date as string, in format DDMMYY
     global websiteDate
     outboundDay = websiteDate[0:2]
@@ -537,6 +546,8 @@ def validateReturnDate(returnDate):
     return outboundDateTime <= inboundDateTime
 
 def parseDelayLocations(KEData, text):
+    #each location in the delay prediction mode needs to be a specific station. This is validated instantly, and they are set here
+    #First departure station is asked, then arrival station, then current station
     global delayDestinationStation, delayDepartureStation, delayStationUserIsAt
     if len(delayStationUserIsAt) == 0:
         if len(delayDepartureStation) == 0 and "delay" not in KEData:
@@ -573,6 +584,7 @@ def parseDelayLocations(KEData, text):
 
 
 def parseLocations(KEData, text):
+    #makes sure the return and outbound locations for a ticket booking are not the same, and sets them
     global websiteDeparture, websiteDestination
     if len(isReturn) > 0:
         if (len(websiteDestination) == 0) and (len(websiteDeparture) == 0) and "booking" not in KEData:
@@ -586,6 +598,7 @@ def parseLocations(KEData, text):
                     userInterface.send_response("Sorry, the destination and departure locations cannot be the same!")
 
 def parseReturnType(KEData):
+    #getting type of return inbound ticket - default is DEPART AFTER TIME, but can be ARRIVE BEFORE TIME or TAKE FIRST TRAIN
     global websiteReturnType
     if "departBefore" in KEData:
         websiteReturnType = "first"
@@ -593,6 +606,7 @@ def parseReturnType(KEData):
         websiteReturnType = "arr"
 
 def parseSingleType(KEData):
+    #like above function, but for type of outbound journey
     global websiteType
     if "departBefore" in KEData:
         websiteType = "first"
@@ -616,6 +630,7 @@ def printStringsDebug():
     print("DELAY_TIME_USER", delayTimeFromUser)
 
 def setDate(date, KEData):
+    #sets the date either as an outbound or inbound journey
     # pass date as string, in format DDMMYY
     global websiteDate, websiteReturnDate
     if len(websiteDate) > 0 and isReturn == "true":
@@ -628,6 +643,7 @@ def setDate(date, KEData):
 
 
 def setTime(time):
+    #sets the time either as an outbound or inbound journey
     # pass time as string, in format HHMM
     global websiteTime, websiteReturnTime
     if len(websiteTime) > 0 and isReturn == "true":
@@ -637,6 +653,8 @@ def setTime(time):
 
 
 def parseFromAndTo(text):
+    #a single sentence saying "book a ticket FROM NORTHAMPTON TO LONDON", this function will parse
+    #2 locations from X to Y and set those
     global websiteDeparture, websiteDestination
     text = text.lower()
     if re.search("(?<![\w\d])from(?![\w\d])", text):
@@ -650,6 +668,7 @@ def parseFromAndTo(text):
 
 
 def parseDate(date, format):
+    #a general function that generates a string date from a date and the format of that date
     now = datetime.datetime.now()
     if re.match("\d\d\d\d", date):
         formatted = datetime.datetime.strptime(date, format)
@@ -661,6 +680,7 @@ def parseDate(date, format):
 
 
 def validateTime(string):
+    #makes sure the 24h string time (HHMM) is valid
     # pass time in format HHMM
     hours = int(string[0:2])
     minutes = int(string[2:4])
@@ -672,6 +692,7 @@ def validateTime(string):
 
 
 def validateDate(string):
+    #makes sure the string date (DDMMYY) is valid, and not in the past
     # pass date in format DDMMYY
     today = datetime.datetime.now()
     inputtedDay = string[0:2]
@@ -686,8 +707,10 @@ def validateDate(string):
 
 
 def isDateTooFarInFuture(string):
+    #national rail can only book dates no further than 82 days ahead
     # pass date in format DDMMYY
-    maxDateForNationalRail = datetime.datetime(2022, 3, 31)
+    maxDateForNationalRail = datetime.datetime.now() + datetime.timedelta(days=82)
+
     inputtedDay = string[0:2]
     inputtedMonth = string[2:4]
     inputtedYear = "20" + string[4:6]
@@ -697,18 +720,21 @@ def isDateTooFarInFuture(string):
 
 
 def stripOrdinals(date):
+    #stripping ordinals from date, like 1*ST*, 2*ND*, etc
     date = str(date)
     date = date.replace("st", "").replace("nd", "").replace("rd", "").replace("th", "")
     return date
 
 
 def datetimeToString(date):
+    #turns a datetime to a DDMMYY string
     string = str(date.day).zfill(2) + str(date.month).zfill(2) + str(date.year)[2:4]
     print(string, "string")
     return string
 
 
 def resetStrings():
+    #resets the internal variables to allow for a new conversation
     global websiteDeparture, websiteDestination, websiteDate, websiteTime, websiteType, websiteReturnDate, \
         websiteReturnTime, websiteReturnType, isBooking, isReturn, isDelay, givenTicket, delayDestinationStation, \
         delayDepartureStation, delayStationUserIsAt, delayTimeFromUser
@@ -730,6 +756,7 @@ def resetStrings():
     delayDepartureStation = ""
 
 def setWeekday(string, KEData):
+    #if e.g. 'Monday' is specified as the date, this function gets the next 'Monday'
     global websiteDate, websiteReturnDate
     string = string.capitalize()
     weekdaysNumber = dict(zip(calendar.day_name, range(7)))
@@ -747,8 +774,4 @@ def setWeekday(string, KEData):
             KEData["outgoingDateBeforeIncoming"] = "true"
     else:
         websiteDate = dateString
-
-
-# verify named entity as location/dummy ticket purchase before moving on to the next step? so user can instantly
-# try another location?
 

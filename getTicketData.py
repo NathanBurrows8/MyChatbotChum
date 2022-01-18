@@ -1,3 +1,6 @@
+# This file is the web-scraping file, called by the Knowledge Engine when it has everything it
+# needs, and wants to display a ticket.
+
 import re
 import string
 import requests
@@ -11,6 +14,9 @@ websiteDate = ""
 websiteReturnDate = ""
 page = ""
 
+#A file of station CRS codes is opened, and the file tries to substitute both departure and arrival locations for
+#a corresponding CRS code. If this cannot be found, a general search for the users text is done instead.
+#e.g. if the user inputs Norwich, this gets substituted to NRW. if they enter London, nothing is done
 def searchForLocations(websiteDeparture, websiteDestination):
     stationCodes = {}
     reader = csv.reader(open('static/crs_codes.csv'))
@@ -30,6 +36,8 @@ def searchForLocations(websiteDeparture, websiteDestination):
               "'. Attempting to search using the location instead..}")
     return websiteDeparture, websiteDestination
 
+#This is the validation of each station in the delay prediction mode, where each station is instantly validated
+#after input. If the users text does not match a CRS code, the validation will fail
 def searchForSingleStation(text):
     stationCodes = {}
     reader = csv.reader(open("static/crs_codes.csv"))
@@ -43,7 +51,7 @@ def searchForSingleStation(text):
     return temp
 
 
-
+#This is called from the KE and generates the correct website for a return ticket
 def formWebsiteReturn(websiteDeparture, websiteDestination, siteDate, websiteTime, websiteType, siteReturnDate, websiteReturnTime, websiteReturnType):
     websiteDeparture, websiteDestination = searchForLocations(websiteDeparture, websiteDestination)
     global websiteDate, websiteReturnDate
@@ -55,7 +63,7 @@ def formWebsiteReturn(websiteDeparture, websiteDestination, siteDate, websiteTim
               + websiteReturnTime + "/" + websiteReturnType
     getData(website)
 
-
+#This is called from the KE and generates the correct website for a single ticket
 def formWebsite(websiteDeparture, websiteDestination, siteDate, websiteTime, websiteType):
     global websiteDate
     websiteDate = siteDate
@@ -64,7 +72,8 @@ def formWebsite(websiteDeparture, websiteDestination, siteDate, websiteTime, web
               + "/" + websiteDate + "/" + websiteTime + "/" + websiteType
     getData(website)
 
-
+#This function scrapes the website and gets all tickets that are highlighted golden (the cheapest ones) in a list.
+#The cheapest price is also scraped here
 def getData(website):
     global page
     page = requests.get(website)
@@ -80,6 +89,7 @@ def getData(website):
 
 
 def parseData(hasCheapest, website, price):
+    #Depending on how many cheapest tickets were found, different json data is loaded from this
     global page
 
     if len(hasCheapest) == 1 and processUserInput.isReturn == "false":
@@ -91,7 +101,9 @@ def parseData(hasCheapest, website, price):
         dict2 = data['singleJsonFareBreakdowns'][0]
 
         printTicket(dict1, dict2, price, website)
+
     elif len(hasCheapest) == 2 and processUserInput.isReturn == "true":
+        #return journey with 2 single tickets being the cheapest option
         soup1 = BeautifulSoup(hasCheapest[0], 'html.parser')
         scriptTag = soup1.find('script')  # print this to find all data given by National Rail
         data = json.loads(scriptTag.contents[0])
@@ -106,7 +118,11 @@ def parseData(hasCheapest, website, price):
 
 
         printReturnTicket(dict1, dict2, dict3, dict4, price, website)
+
     elif len(hasCheapest) == 1 and processUserInput.isReturn == "true":
+        #return journey with 1 return ticket being the cheapest option -- however, just printing 1 ticket will not
+        #display properly. So, we scrape the ticket that is highlighted as automatically SELECTED instead and
+        #display that alongside with the outbound ticket.
         soup1 = BeautifulSoup(hasCheapest[0], 'html.parser')
         scriptTag = soup1.find('script')  # print this to find all data given by National Rail
         data = json.loads(scriptTag.contents[0])
@@ -114,7 +130,7 @@ def parseData(hasCheapest, website, price):
         dict2 = data['singleJsonFareBreakdowns'][0]
 
         #sometimes the return is not selected as the cheapest, so here is the workaround to get the return that is
-        #automatically selected by the website, when it is not highlighted as the cheapest
+        #automatically selected by the website, when it is not highlighted as the cheapest (it is labelled as SELECTED)
         dict3 = {}
         dict4 = {}
         soup = BeautifulSoup(page.content, 'html.parser')
@@ -133,9 +149,6 @@ def parseData(hasCheapest, website, price):
 
         printReturnTicket(dict1, dict2, dict3, dict4, price, website)
 
-    #todo - find a journey that has neither outbound or inbound selected as cheapest, to test a final elif statement
-    #need to find out if the above ^ ever happens?? or if the outbound is always selected at the least
-    #elif len(hasCheapest) == 0 and processUserInput.isReturn == "true":
 
     else:
         print("No results were found for the journey - were the locations inputted correctly?")
@@ -144,6 +157,9 @@ def parseData(hasCheapest, website, price):
         print(website)
 
 def printReturnTicket(dict1, dict2, dict3, dict4, price, website):
+    #This function displays the complete ticket data for a return ticket.
+    #Many of the lines below are syntax changes to display the time and change numbers effectively. The robot will now
+    #say '1 minute' '1 hour and 1 minute' 'exactly 1 hour' 'exactly 2 hours' '2 hours and 2 minutes' '1 change' etc
     global websiteDate, websiteReturnDate
     timeString = "This journey will take "
     extraTimeString = ""
@@ -211,18 +227,20 @@ def printReturnTicket(dict1, dict2, dict3, dict4, price, website):
             timeString1 = timeString1 + extraTimeString1 + extraMinuteString1 + "and has " + str(dict3['changes']) \
                          + " change" + pluralForChanges1 + ".<br>"
 
+            #this is the ticket string being formed for the outbound journey
     ticket = "------------------------FOR " + websiteDate[0:2] + "/" + websiteDate[2:4] + "/" + websiteDate[4:6] \
             + "-----------------------<br> The cheapest outbound journey departs from " + str(dict1['departureStationName']) \
             + " at " + str(dict1['departureTime']) + ", and arrives at " + str(dict1['arrivalStationName']) + " at " \
             + str(dict1['arrivalTime']) + ".<br> " + timeString + "(Journey provided by " + str(dict2['tocName']) \
             + ")<br>"
 
-
+            #detailing any possible disruptions on the route
     if dict1['statusIcon'] == "AMBER_TRIANGLE":
         if dict1['statusMessage'] == "bus service":
             ticket = ticket + "(Some or all of this journey is via bus. Check the booking website for details.)<br>"
         else:
             ticket = ticket + "(There may be some disruption on this route. Check the booking website for details.) <br>"
+            #below is the same, but for the inbound journey
     ticket = ticket + "------------------------FOR " + websiteReturnDate[0:2] + "/" + websiteReturnDate[2:4] + "/" + websiteReturnDate[4:6] \
             + "-----------------------<br> The cheapest inbound journey departs from " + str(dict3['departureStationName']) \
             + " at " + str(dict3['departureTime']) + ", and arrives at " + str(dict3['arrivalStationName']) + " at " \
@@ -244,6 +262,7 @@ def printReturnTicket(dict1, dict2, dict3, dict4, price, website):
 
 
 def printTicket(dict1, dict2, price, website):
+    #below is the same function in essence, but for a single ticket instead of a return ticket
     global websiteDate
     timeString = "The journey will take "
     extraTimeString = ""

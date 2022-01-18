@@ -1,3 +1,8 @@
+#This file is the Knowledge Engine. A dictionary is passed to it from processUserInput, with the text and what
+#labels that text has. Based on those labels, and the rules detailed below, this is the file that determines
+#what robot response should be displayed.
+
+
 # the original plan was to use PyKE but this only works on Python 2.x and is deprecated - as this had the most documentation/was most popular
 # now the plan is to use Experta which is a fork for PyKnow (also deprecated). Can be pip installed
 # Experta is a Python library based on the CLIPS programming language.
@@ -9,10 +14,12 @@ import predictDelay
 import userInterface
 import processUserInput
 
-with open("./static/intents.json") as json_file:
+with open("./static/intents.json") as json_file:    # this data is intents.json, the robots vocabulary
     jsondata = json.load(json_file)
 
 class Bot(KnowledgeEngine):
+# This is the rule based KE. The validation functions have the highest salience, which means they are prioritised
+# and fired first. Each function gives a different robot response based on certain conditions.
 
     @Rule(salience=57)
     def unable_to_parse_time(self):
@@ -222,6 +229,8 @@ class Bot(KnowledgeEngine):
             self.declare(Fact(messageSent="true"))
 
 def finalResponseText(nlp):
+    #This is called from processUserInput. The dictionary is passed to the KE, and the KE is run. This is the last step
+    #before the final response text is sent back to the javascript file to be displayed.
     bot = Bot()
     bot.dictionary = nlp
     print(nlp)
@@ -231,5 +240,3 @@ def finalResponseText(nlp):
 
 def getIntroText():
     return random.choice(jsondata["question_type_of_booking"])
-
-# this is an example from the experta website, read the documentation https://experta.readthedocs.io/en/latest/

@@ -1,3 +1,7 @@
+#This file takes in 3 stations (departure, arrival, current) and a quoted delay time, and attempts to predict
+#the total delay at the user's arrival destination, using prior train data as a training set
+
+
 import json
 import requests
 import datetime
@@ -19,7 +23,7 @@ delayAtStation = ""
 
 #this is the history of a train route between certain times
 def getTrainRIDS(departureCode, arrivalCode, departureTime, arrivalTime, departureDate, arrivalDate):
-    #change date here to "YYYY-MM-DD"
+    #date should be passed as YYYY-MM-DD
     data = {
       "from_loc": departureCode,
       "to_loc": arrivalCode,
@@ -38,9 +42,9 @@ def getTrainRIDS(departureCode, arrivalCode, departureTime, arrivalTime, departu
             individualTrain = rid.get("serviceAttributesMetrics").get("rids")
             for train in individualTrain:
                 ridList.append(str(train))
-        return ridList
+        return ridList  #this list gets the ids of each train in a certain timespan on this route
     else:
-        return False #error handle this
+        return False
 
 #this is the individual train data from a train on that route
 def getDataFromRID(rid):
@@ -54,13 +58,14 @@ def getDataFromRID(rid):
 def predict(departureCode, arrivalCode, stationCode, delayInMinutes):
     global delayAtStation
     ridList = getTrainRIDS(departureCode, arrivalCode, "0700", "0800", "2016-07-01", "2016-08-01")
+    #currently we are getting one months of data at a time, but this API call takes time
     if ridList is not False:
         inputArray = []
         trainDataList = []
         for rid in ridList:
             trainDataList.append(getDataFromRID(rid))
 
-        location_list = []
+        location_list = []  #getting a list of all locations a train goes to during a certain route
         for i in trainDataList:
             location_list.append(i['serviceAttributesDetails']['locations'])
 
@@ -70,8 +75,8 @@ def predict(departureCode, arrivalCode, stationCode, delayInMinutes):
             processUserInput.resetStrings()
         else:
             for i in location_list:
-                for j in i:
-                    if j['location'] == stationCode:
+                for j in i:     #iterating through each location
+                    if j['location'] == stationCode:        #if this index is the station the user is at
                         expectedDep = j['gbtt_ptd']
                         if len(expectedDep) == 0:
                             break
@@ -84,7 +89,7 @@ def predict(departureCode, arrivalCode, stationCode, delayInMinutes):
                             actualDepTime = expectedDepTime
                         delayAtStation = int((actualDepTime - expectedDepTime).seconds / 60)    #in minutes
 
-                    elif j['location'] == arrivalCode and len(str(delayAtStation)) != 0:
+                    elif j['location'] == arrivalCode and len(str(delayAtStation)) != 0:    #if this index is the arrival station
                         if len(str(delayAtStation)) != 0:
                             expectedDep = j['gbtt_pta']
                             if len(expectedDep) == 0:
@@ -107,7 +112,7 @@ def predict(departureCode, arrivalCode, stationCode, delayInMinutes):
         arr = np.array(inputArray)
         userInterface.send_response("Predicting delay...")
         try:
-            nn = MLPRegressor(max_iter=9000).fit(arr[:, :-1], arr[:, -1])
+            nn = MLPRegressor(max_iter=9000).fit(arr[:, :-1], arr[:, -1])   #a multilayer perceptron is the AI model
             prediction = nn.predict([[delayInMinutes]])[0]
             print("PREDICTION", prediction)
             prediction = int(prediction)

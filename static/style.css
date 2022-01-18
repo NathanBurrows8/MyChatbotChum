@@ -1,3 +1,5 @@
+
+/* general css for the repeating vector background */
 body {
   background-image: url('background.svg');
   background-size: 300px 300px;
@@ -162,6 +164,7 @@ space between every text bubble */
   height: 30px;
 }
 
+/* this is just for the volume button in the header */
 #volumeButton {
   height: 36px;
   background-color: transparent;
@@ -170,6 +173,7 @@ space between every text bubble */
   vertical-align: middle;
 }
 
+/* this is the icon the volume button is using */
 #volumeIcon {
   height: 34px;
 }

@@ -9,13 +9,20 @@
       <script type="text/javascript" src="{{ url_for('static', filename='javascript.js') }}"></script>
      <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
       <script>
+          //here is the javascript-side websocket code. Firstly we establish a connection
           var socket = io.connect("http://127.0.0.1:5000");
+
+          //when the user sends a message in the browser, this is given to python in this function
           function sendToPython(text){
               socket.emit('message_from_javascript', text);
           }
+
+          //when python completes the robot response, this is retrieved in javascript in this function
           socket.on('message_from_python', function(msg) {
               addRobotMessage(msg);
           });
+
+          //this detects when the page is refreshed
           if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
               socket.emit('page_reload', 200);
               speechSynthesis.cancel()
@@ -25,7 +32,6 @@
 
   <body onload="micAnalysis()">
 
-<!-- Header to go here? Like a banner across the top saying you're talking to an Assistant? / like ios mesages? -->
 
 <!-- This is the conversation text box -->
 <div class="header">
@@ -70,7 +76,7 @@
         </div>
         -->
 </div>
-
+<!-- This is the text box that the user inputs their message into, along with the 2 buttons (mic/send) -->
 <div class="textBox">
   <div class="textAndButtonGroup">
     <input type="text" placeholder="Type your message here..." id="textBoxInput" onclick="removeTextGlow()"
