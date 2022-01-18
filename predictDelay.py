@@ -53,7 +53,7 @@ def getDataFromRID(rid):
 
 def predict(departureCode, arrivalCode, stationCode, delayInMinutes):
     global delayAtStation
-    ridList = getTrainRIDS(departureCode, arrivalCode, "0700", "0800", "2016-07-01", "2016-07-27")
+    ridList = getTrainRIDS(departureCode, arrivalCode, "0700", "0800", "2016-07-01", "2016-08-01")
     if ridList is not False:
         inputArray = []
         trainDataList = []
@@ -107,20 +107,24 @@ def predict(departureCode, arrivalCode, stationCode, delayInMinutes):
         arr = np.array(inputArray)
         userInterface.send_response("Predicting delay...")
         try:
-            nn = MLPRegressor(max_iter=6000).fit(arr[:, :-1], arr[:, -1])
+            nn = MLPRegressor(max_iter=9000).fit(arr[:, :-1], arr[:, -1])
             prediction = nn.predict([[delayInMinutes]])[0]
+            print("PREDICTION", prediction)
+            prediction = int(prediction)
+            if prediction < 1:
+                userInterface.send_response(
+                    "Good news! You are still expected to arrive on time. Thanks for using our service.")
+            elif prediction == 1:
+                userInterface.send_response(
+                    "I predict that you will be just 1 minute late to your destination. Thanks for using our service.")
+            else:
+                userInterface.send_response("I predict that you will be " + str(
+                    prediction) + " minutes late to your destination. Thanks for using our service.")
+            processUserInput.resetStrings()
         except Exception:
             userInterface.send_response("Sorry, I can't find the station you're at on this route. Want me to predict another delay, or book a train ticket?")
             processUserInput.resetStrings()
-        print("PREDICTION", prediction)
-        prediction = int(prediction)
-        if prediction < 1:
-            userInterface.send_response("Good news! You are still expected to arrive on time. Thanks for using our service.")
-        elif prediction == 1:
-            userInterface.send_response("I predict that you will be just 1 minute late to your destination. Thanks for using our service.")
-        else:
-            userInterface.send_response("I predict that you will be " + str(prediction) + " minutes late to your destination. Thanks for using our service.")
-        processUserInput.resetStrings()
+
     else:
         userInterface.send_response("Sorry, I couldn't find any results for this journey. Want me to predict another route, or book a train ticket?")
         processUserInput.resetStrings()
