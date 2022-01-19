@@ -522,7 +522,7 @@ def getUserInput(text):
 def parseDelayTime(KEData, text):
     #getting an integer when the user is prompted to enter a delay time in minutes
     global delayTimeFromUser, delayDepartureTime
-    if "noMatches" in KEData:
+    if "noMatches" in KEData and len(delayDepartureTime) > 0:
         try:
             delayTimeFromUser = re.search("\d+", text).group()
             KEData["readyToCalculate"] = "true"
