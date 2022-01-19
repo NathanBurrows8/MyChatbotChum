@@ -143,6 +143,7 @@ websiteReturnType = ""
 
 delayDepartureStation = ""
 delayDestinationStation = ""
+delayDepartureTime = ""
 delayTimeFromUser = ""
 delayStationUserIsAt = ""
 
@@ -520,12 +521,13 @@ def getUserInput(text):
 
 def parseDelayTime(KEData, text):
     #getting an integer when the user is prompted to enter a delay time in minutes
-    global delayTimeFromUser
-    try:
-        delayTimeFromUser = re.search("\d+", text).group()
-        KEData["readyToCalculate"] = "true"
-    except Exception:
-        KEData["invalidDelayTime"] = "true"
+    global delayTimeFromUser, delayDepartureTime
+    if "noMatches" in KEData:
+        try:
+            delayTimeFromUser = re.search("\d+", text).group()
+            KEData["readyToCalculate"] = "true"
+        except Exception:
+            KEData["invalidDelayTime"] = "true"
 
 def validateReturnDate(returnDate):
     #making sure the return date is a valid date, and after the outbound date
@@ -548,8 +550,8 @@ def validateReturnDate(returnDate):
 def parseDelayLocations(KEData, text):
     #each location in the delay prediction mode needs to be a specific station. This is validated instantly, and they are set here
     #First departure station is asked, then arrival station, then current station
-    global delayDestinationStation, delayDepartureStation, delayStationUserIsAt
-    if len(delayStationUserIsAt) == 0:
+    global delayDestinationStation, delayDepartureStation, delayStationUserIsAt, delayDepartureTime
+    if len(delayStationUserIsAt) == 0 and len(delayDepartureTime) == 0:
         if len(delayDepartureStation) == 0 and "delay" not in KEData:
             station = getTicketData.searchForSingleStation(text)
             if not station:
@@ -563,7 +565,7 @@ def parseDelayLocations(KEData, text):
             if station == False:
                 KEData["noStationFound"] = "true"
             else:
-                if station != delayDepartureStation and station != delayDestinationStation:
+                if station != delayDestinationStation:
                     delayStationUserIsAt = station
                     KEData["stationFound"] = "true"
                 else:
@@ -626,6 +628,7 @@ def printStringsDebug():
     print("WEBSITE_RETURN_TYPE", websiteReturnType)
     print("DELAY_DEPARTURE", delayDepartureStation)
     print("DELAY_DESTINATION", delayDestinationStation)
+    print("DELAY_DEPARTURE_TIME", delayDepartureTime)
     print("DELAY_STATION", delayStationUserIsAt)
     print("DELAY_TIME_USER", delayTimeFromUser)
 
@@ -645,11 +648,15 @@ def setDate(date, KEData):
 def setTime(time):
     #sets the time either as an outbound or inbound journey
     # pass time as string, in format HHMM
-    global websiteTime, websiteReturnTime
-    if len(websiteTime) > 0 and isReturn == "true":
-        websiteReturnTime = time
-    else:
-        websiteTime = time
+    global websiteTime, websiteReturnTime, delayDestinationStation, delayDepartureTime
+    if isBooking == "true":
+        if len(websiteTime) > 0 and isReturn == "true":
+            websiteReturnTime = time
+        else:
+            websiteTime = time
+    elif isBooking == "false":
+        if len(delayDestinationStation) > 0:
+           delayDepartureTime = time
 
 
 def parseFromAndTo(text):
@@ -737,7 +744,7 @@ def resetStrings():
     #resets the internal variables to allow for a new conversation
     global websiteDeparture, websiteDestination, websiteDate, websiteTime, websiteType, websiteReturnDate, \
         websiteReturnTime, websiteReturnType, isBooking, isReturn, isDelay, givenTicket, delayDestinationStation, \
-        delayDepartureStation, delayStationUserIsAt, delayTimeFromUser
+        delayDepartureStation, delayStationUserIsAt, delayTimeFromUser, delayDepartureTime
     isBooking = ""
     isReturn = ""
     isDelay = ""
@@ -754,6 +761,7 @@ def resetStrings():
     delayTimeFromUser = ""
     delayDestinationStation = ""
     delayDepartureStation = ""
+    delayDepartureTime = ""
 
 def setWeekday(string, KEData):
     #if e.g. 'Monday' is specified as the date, this function gets the next 'Monday'

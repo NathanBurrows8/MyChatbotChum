@@ -93,7 +93,10 @@
     ["Sorry, you cannot choose this station! Please specify again."],
 
     "validation_unable_to_parse_time":
-    ["Apologies, I could not quite understand that time! Please state it again."]
+    ["Apologies, I could not quite understand that time! Please state it again."],
+
+    "question_departure_time_delay":
+    ["What time did you depart?"]
   }
 
 

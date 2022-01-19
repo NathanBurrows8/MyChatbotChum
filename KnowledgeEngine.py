@@ -21,14 +21,14 @@ class Bot(KnowledgeEngine):
 # This is the rule based KE. The validation functions have the highest salience, which means they are prioritised
 # and fired first. Each function gives a different robot response based on certain conditions.
 
-    @Rule(salience=57)
+    @Rule(salience=59)
     def unable_to_parse_time(self):
         if "invalidDelayTime" in self.dictionary:
             userInterface.send_response(random.choice(jsondata["validation_unable_to_parse_time"]))
             self.declare(Fact(said="invalid_delay_time"))
             self.declare(Fact(messageSent="true"))
 
-    @Rule(salience=56)
+    @Rule(salience=58)
     def station_not_found_delay(self):
         if "noStationFound" in self.dictionary:
             userInterface.send_response(random.choice(jsondata["validation_no_station_found"]))
@@ -36,49 +36,49 @@ class Bot(KnowledgeEngine):
             self.declare(Fact(messageSent="true"))
 
 
-    @Rule(salience=55)
+    @Rule(salience=57)
     def duplicate_station_delay(self):
         if "duplicateStation" in self.dictionary:
             userInterface.send_response(random.choice(jsondata["validation_duplicate_station"]))
             self.declare(Fact(said="duplicate_station_delay"))
             self.declare(Fact(messageSent="true"))
 
-    @Rule(salience=54)
+    @Rule(salience=56)
     def outgoing_date_before_incoming(self):
         if "outgoingDateBeforeIncoming" in self.dictionary:
             userInterface.send_response(random.choice(jsondata["outgoing_date_before_incoming"]))
             self.declare(Fact(said="outgoing_date_before_incoming"))
             self.declare(Fact(messageSent="true"))
 
-    @Rule(salience=53)
+    @Rule(salience=55)
     def invalid_time(self):
         if "invalidTime" in self.dictionary:
             userInterface.send_response(random.choice(jsondata["validation_invalid_time"]))
             self.declare(Fact(said="invalid_time"))
             self.declare(Fact(messageSent="true"))
 
-    @Rule(salience=52)
+    @Rule(salience=54)
     def date_in_future(self):
         if "dateTooFarInFuture" in self.dictionary:
             userInterface.send_response(random.choice(jsondata["validation_future_date"]))
             self.declare(Fact(said="date_in_future"))
             self.declare(Fact(messageSent="true"))
 
-    @Rule(salience=51)
+    @Rule(salience=53)
     def invalid_date(self):
         if "invalidDate" in self.dictionary:
             userInterface.send_response(random.choice(jsondata["validation_invalid_date"]))
             self.declare(Fact(said="invalid_date"))
             self.declare(Fact(messageSent="true"))
 
-    @Rule(salience=50)
+    @Rule(salience=52)
     def initial_greeting(self):  # and no strings gathered
         if "hello" in self.dictionary:
             userInterface.send_response(random.choice(jsondata["hello"]))
             self.declare(Fact(said="hello"))
             self.declare(Fact(messageSent="true"))
 
-    @Rule(salience=49)
+    @Rule(salience=51)
     def ask_if_return(self):  # and no strings gathered
         if "booking" in self.dictionary:
             if "single" not in self.dictionary and "return" not in self.dictionary:
@@ -87,7 +87,7 @@ class Bot(KnowledgeEngine):
                 self.declare(Fact(messageSent="true"))
 
     @Rule(NOT(Fact(messageSent="true")),
-          salience=48)
+          salience=50)
     def ask_departure_location(self):
         if processUserInput.isBooking == "true":
             if processUserInput.websiteDeparture == "":
@@ -97,7 +97,7 @@ class Bot(KnowledgeEngine):
 
 
     @Rule(NOT(Fact(messageSent="true")),
-          salience=45)
+          salience=49)
     def ask_arrival_location(self):
         if len(processUserInput.websiteDeparture) > 0:
             if processUserInput.websiteDestination == "":
@@ -106,7 +106,7 @@ class Bot(KnowledgeEngine):
                 self.declare(Fact(messageSent="true"))
 
     @Rule(NOT(Fact(messageSent="true")),
-          salience=47)
+          salience=48)
     def ask_departure_date(self):
         if len(processUserInput.websiteDestination) > 0:
             if len(processUserInput.websiteDate) == 0:
@@ -115,7 +115,7 @@ class Bot(KnowledgeEngine):
                 self.declare(Fact(messageSent="true"))
 
     @Rule(NOT(Fact(messageSent="true")),
-          salience=46)
+          salience=47)
     def ask_departure_time(self):
         if len(processUserInput.websiteDate) > 0:
             if len(processUserInput.websiteTime) == 0:
@@ -125,7 +125,7 @@ class Bot(KnowledgeEngine):
 
 
     @Rule(NOT(Fact(messageSent="true")),
-          salience=45)
+          salience=46)
     def complete_single_ticket(self):
         if processUserInput.isBooking == "true":
             if processUserInput.isReturn == "false":
@@ -140,7 +140,7 @@ class Bot(KnowledgeEngine):
                     processUserInput.resetStrings()
 
     @Rule(NOT(Fact(messageSent="true")),
-          salience=44)
+          salience=45)
     def ask_arrival_date(self):
         if processUserInput.isReturn == "true":
             if len(processUserInput.websiteReturnDate) == 0:
@@ -149,7 +149,7 @@ class Bot(KnowledgeEngine):
                 self.declare(Fact(messageSent="true"))
 
     @Rule(NOT(Fact(messageSent="true")),
-          salience=43)
+          salience=44)
     def ask_arrival_time(self):
         if len(processUserInput.websiteReturnDate) > 0:
             if len(processUserInput.websiteReturnTime) == 0:
@@ -158,7 +158,7 @@ class Bot(KnowledgeEngine):
                 self.declare(Fact(messageSent="true"))
 
     @Rule(NOT(Fact(messageSent="true")),
-          salience=42)
+          salience=43)
     def complete_return_ticket(self):
         if processUserInput.isBooking == "true":
             if processUserInput.isReturn == "true":
@@ -179,7 +179,7 @@ class Bot(KnowledgeEngine):
                     processUserInput.resetStrings()
 
     @Rule(NOT(Fact(messageSent="true")),
-          salience=41)
+          salience=42)
     def ask_departure_station_delay(self):
         if "delay" in self.dictionary:
             if len(processUserInput.delayDestinationStation) == 0:
@@ -188,15 +188,17 @@ class Bot(KnowledgeEngine):
                 self.declare(Fact(said="ask_departure_station_delay"))
 
     @Rule(NOT(Fact(messageSent="true")),
-          salience=40)
+          salience=41)
     def ask_destination_station_delay(self):
         if len(processUserInput.delayDepartureStation) > 0 and len(processUserInput.delayDestinationStation) == 0:
             userInterface.send_response(random.choice(jsondata["question_destination_station_delay"]))
             self.declare(Fact(messageSent="true"))
             self.declare(Fact(said="ask_destination_station_delay"))
 
+
+
     @Rule(NOT(Fact(messageSent="true")),
-          salience=39)
+          salience=40)
     def ask_current_station_delay(self):
         if len(processUserInput.delayDestinationStation) > 0 and len(processUserInput.delayStationUserIsAt) == 0:
             userInterface.send_response(random.choice(jsondata["question_current_station_delay"]))
@@ -204,9 +206,17 @@ class Bot(KnowledgeEngine):
             self.declare(Fact(said="ask_current_station_delay"))
 
     @Rule(NOT(Fact(messageSent="true")),
+          salience=39)
+    def ask_departure_time_delay(self):
+        if len(processUserInput.delayStationUserIsAt) > 0 and len(processUserInput.delayDepartureTime) == 0:
+            userInterface.send_response(random.choice(jsondata["question_departure_time_delay"]))
+            self.declare(Fact(messageSent="true"))
+            self.declare(Fact(said="ask_departure_time_delay"))
+
+    @Rule(NOT(Fact(messageSent="true")),
           salience=38)
     def ask_delay_time(self):
-        if len(processUserInput.delayStationUserIsAt) > 0 and len(processUserInput.delayTimeFromUser) == 0:
+        if len(processUserInput.delayDepartureTime) > 0 and len(processUserInput.delayTimeFromUser) == 0:
             userInterface.send_response(random.choice(jsondata["question_delay_time"]))
             self.declare(Fact(messageSent="true"))
             self.declare(Fact(said="ask_delay_time"))
@@ -216,7 +226,8 @@ class Bot(KnowledgeEngine):
     def calculate_delay(self):
         if "readyToCalculate" in self.dictionary:
             predictDelay.predict(processUserInput.delayDepartureStation, processUserInput.delayDestinationStation,
-                                    processUserInput.delayStationUserIsAt, int(processUserInput.delayTimeFromUser))
+                                 processUserInput.delayDepartureTime, processUserInput.delayStationUserIsAt,
+                                 int(processUserInput.delayTimeFromUser))
             self.declare(Fact(messageSent="true"))
 
 

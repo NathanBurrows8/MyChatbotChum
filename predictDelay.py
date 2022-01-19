@@ -55,9 +55,18 @@ def getDataFromRID(rid):
     trainData = r.json()
     return trainData
 
-def predict(departureCode, arrivalCode, stationCode, delayInMinutes):
+def predict(departureCode, arrivalCode, departureTime, stationCode, delayInMinutes):
     global delayAtStation
-    ridList = getTrainRIDS(departureCode, arrivalCode, "0700", "0800", "2016-07-01", "2016-08-01")
+    #getting an hour window of trains leaving 30mins before - 30mins after given departure time
+    hours = int(departureTime[0:2])
+    minutes = int(departureTime[2:4])
+    formattedTime = datetime.datetime(2020,1,1,hours,minutes,0)
+    beginningTime = formattedTime - datetime.timedelta(minutes=30)
+    endTime = formattedTime + datetime.timedelta(minutes=30)
+    beginningTimeString = str(beginningTime.hour).zfill(2) + str(beginningTime.minute).zfill(2)
+    endTimeString = str(endTime.hour).zfill(2) + str(endTime.minute).zfill(2)
+
+    ridList = getTrainRIDS(departureCode, arrivalCode, beginningTimeString, endTimeString, "2016-07-01", "2016-08-01")
     #currently we are getting one months of data at a time, but this API call takes time
     if ridList is not False:
         inputArray = []
@@ -89,7 +98,7 @@ def predict(departureCode, arrivalCode, stationCode, delayInMinutes):
                             actualDepTime = expectedDepTime
                         delayAtStation = int((actualDepTime - expectedDepTime).seconds / 60)    #in minutes
 
-                    elif j['location'] == arrivalCode and len(str(delayAtStation)) != 0:    #if this index is the arrival station
+                    elif j['location'] == arrivalCode:   #if this index is the arrival station
                         if len(str(delayAtStation)) != 0:
                             expectedDep = j['gbtt_pta']
                             if len(expectedDep) == 0:
