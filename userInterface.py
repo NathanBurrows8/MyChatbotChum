@@ -23,9 +23,9 @@ def intro():
 # using websockets to send the users message from javascript to python. This input is processed via processUserInput
 @socketio.on("message_from_javascript")
 def handle_message(data):
-    processUserInput.getUserInput(data)
+    processUserInput.labelUserInput(data)
 
-# when the page reloads/refreshes, reset the varaibles thus resetting the conversation
+# when the page reloads/refreshes, reset the variables thus resetting the conversation
 @socketio.on("page_reload")
 def reload(data):
     processUserInput.resetStrings()

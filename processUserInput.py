@@ -184,7 +184,7 @@ matcher.add("dottedTimeWithSpaceMorning", [dottedTimeWithSpaceMorningRegex])
 matcher.add("dottedTimeWithSpaceEvening", [dottedTimeWithSpaceEveningRegex])
 
 
-def getUserInput(text):
+def labelUserInput(text):
     global websiteDeparture, websiteDestination, isReturn, websiteType, websiteDate, websiteTime, isBooking, websiteReturnType
 
     dictionary = {}
