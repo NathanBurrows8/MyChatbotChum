@@ -120,11 +120,12 @@ dottedTimeWithSpaceEveningRegex = [
 
 #   Regex Notes:
 # currently 23rd jan works but not 23 jan - i think this is fine?
+# currently '1:45 pm' only picks up 1pm
 # 0am and 0pm are not split by spacy like 1am, etc, so we cannot get specific invalidDate error message
 # currently 1:35 defaults to 1:35am
 # "23rd feb 2023" fires writtenDateShorterMonth, which gives a valid string of 230222 <-- no regex to pick up written
 #      date with a year
-# NationalRail dateTooFarInFuture is always progressing <-- should we code this in?
+
 
 #these are the variables that the bot needs to make a valid request to National Rail or the MLPRegressor
 isBooking = ""

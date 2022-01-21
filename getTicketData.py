@@ -79,12 +79,17 @@ def getData(website):
     page = requests.get(website)
     # scraping all html
     soup = BeautifulSoup(page.content, 'html.parser')
-    price = re.search("(?<=Buy cheapest for £ )(\d?)(\d?)\d.\d\d", str(soup)).group(0)
-    hasCheapest = []
-    for item in soup.find_all("td", class_="fare has-cheapest"):
-        # getting cheapest fare item from table
-        hasCheapest.append(str(item))
-    parseData(hasCheapest, website, price)
+    try:
+        price = re.search("(?<=Buy cheapest for £ )(\d?)(\d?)\d.\d\d", str(soup)).group(0)
+        hasCheapest = []
+        for item in soup.find_all("td", class_="fare has-cheapest"):
+            # getting cheapest fare item from table
+            hasCheapest.append(str(item))
+        parseData(hasCheapest, website, price)
+    except AttributeError:
+        userInterface.send_response("Sorry, I didnt understand that query! Would you like me to help you make a booking, or find potential delays?")
+        processUserInput.resetStrings()
+
 
 
 

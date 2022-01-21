@@ -1,9 +1,9 @@
 spacy==2.3.5
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz
-bs4==0.0.1
-requests==2.25.1
-experta==1.9.4
-flask==1.1.2
-flask-socketio==4.3.2
-numpy==1.19.3
-scikit-learn==1.0.2
+bs4
+requests
+experta
+flask
+flask-socketio
+numpy
+scikit-learn

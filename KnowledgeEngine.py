@@ -133,7 +133,7 @@ class Bot(KnowledgeEngine):
                         len(processUserInput.websiteDate) > 0 and len(processUserInput.websiteTime) > 0:
                     if len(processUserInput.websiteType) == 0:
                         processUserInput.websiteType = "dep"
-                    getTicketData.formWebsite(processUserInput.websiteDeparture, processUserInput.websiteDestination,
+                    getTicketData.formWebsite(processUserInput.websiteDeparture.strip(), processUserInput.websiteDestination.strip(),
                                               processUserInput.websiteDate, processUserInput.websiteTime,
                                               processUserInput.websiteType)
                     self.declare(Fact(messageSent="true"))
@@ -169,8 +169,8 @@ class Bot(KnowledgeEngine):
                         processUserInput.websiteType = "dep"
                     if len(processUserInput.websiteReturnType) == 0:
                         processUserInput.websiteReturnType = "dep"
-                    getTicketData.formWebsiteReturn(processUserInput.websiteDeparture,
-                                                    processUserInput.websiteDestination, processUserInput.websiteDate,
+                    getTicketData.formWebsiteReturn(processUserInput.websiteDeparture.strip(),
+                                                    processUserInput.websiteDestination.strip(), processUserInput.websiteDate,
                                                     processUserInput.websiteTime, processUserInput.websiteType,
                                                     processUserInput.websiteReturnDate,
                                                     processUserInput.websiteReturnTime,
