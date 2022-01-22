@@ -239,6 +239,13 @@ class Bot(KnowledgeEngine):
             self.declare(Fact(said="thanks"))
             self.declare(Fact(messageSent="true"))
 
+    @Rule(salience=35)
+    def goodbye(self):
+        if "goodbye" in self.dictionary and processUserInput.givenTicket == "true":
+            userInterface.send_response(random.choice(jsondata["goodbye"]))
+            self.declare(Fact(said="goodbye"))
+            self.declare(Fact(messageSent="true"))
+
 
     @Rule(NOT(Fact(messageSent="true")),
           salience=2)

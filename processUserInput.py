@@ -118,7 +118,7 @@ dottedTimeWithSpaceEveningRegex = [
     {"LOWER": {"REGEX": "p.m."}}
 ]
 thanksRegex = [
-    {"LOWER": {"REGEX": "thanks|thankyou|cheers|ty"}}
+    {"LOWER": {"REGEX": "thanks|thankyou|thank(?![\S])|cheers|ty"}}
 ]
 
 #   Regex Notes:

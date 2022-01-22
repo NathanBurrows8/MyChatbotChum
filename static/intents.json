@@ -5,6 +5,10 @@
   
     "thanks": 
     ["Happy to help!", "Happy to be of assistance!", "Glad I could help!", "My pleasure!"],
+
+
+    "goodbye":
+    ["Bye! See you again soon!", "Farewell!", "Until next time!"],
   
   
     "question_type_of_booking": 
