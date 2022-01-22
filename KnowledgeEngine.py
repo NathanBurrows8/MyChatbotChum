@@ -74,9 +74,10 @@ class Bot(KnowledgeEngine):
     @Rule(salience=52)
     def initial_greeting(self):  # and no strings gathered
         if "hello" in self.dictionary:
-            userInterface.send_response(random.choice(jsondata["hello"]))
-            self.declare(Fact(said="hello"))
-            self.declare(Fact(messageSent="true"))
+            if processUserInput.isBooking == "":
+                userInterface.send_response(random.choice(jsondata["hello"]))
+                self.declare(Fact(said="hello"))
+                self.declare(Fact(messageSent="true"))
 
     @Rule(salience=51)
     def ask_if_return(self):  # and no strings gathered

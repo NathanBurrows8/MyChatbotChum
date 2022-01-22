@@ -216,13 +216,15 @@ console.log("myTester called")
     // STEP 2: add a new string for that expected final output
     const finalExpectedOutputStringList = [
         "------------------------FOR 22/01/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 08:20, and arrives at Norwich at 09:40.<br>The journey will take 1 hour  and 20 minutes, and has 0 changes.<br>The ticket will cost £20.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/220122/0800/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>",
-        "------------------------FOR 23/01/22-----------------------<br> The cheapest journey departs from London Liverpool Street</mark> at 12:18, and arrives at Norwich at 14:55.<br>The journey will take 2 hours  and 37 minutes, and has 2 changes.<br>The ticket will cost £15.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/London/NRW/230122/1200/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(Some or all of this journey is via bus. Check the booking website for details)<br>"
+        "------------------------FOR 23/01/22-----------------------<br> The cheapest journey departs from London Liverpool Street</mark> at 12:18, and arrives at Norwich at 14:55.<br>The journey will take 2 hours  and 37 minutes, and has 2 changes.<br>The ticket will cost £15.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/London/NRW/230122/1200/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(Some or all of this journey is via bus. Check the booking website for details)<br>",
+        "------------------------FOR 28/01/22-----------------------<br> The cheapest journey departs from Northampton</mark> at 12:05, and arrives at London Euston at 13:23.<br>The journey will take 1 hour  and 18 minutes, and has 0 changes.<br>The ticket will cost £11.30.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/northampton/london/280122/1200/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by London Northwestern Railway)<br>"
     ]
 
     // STEP 1: Specify input strings inside a new nested list and add expected response types in a comment next to it
     const listsofInputs = [
         ["booking", "single", "cambridge", "norwich", "today", "8:00"],     //expected response type = [4,5,6,9,7]
-        ["book", "single", "London", "Norwich", "tomorrow", "noon"]         //expected response type = [4,5,6,9,7]
+        ["book", "single", "London", "Norwich", "tomorrow", "noon"],         //expected response type = [4,5,6,9,7]
+        ["book a single ticket", "northampton", "london", "friday#", "12pm"] //expected response type = [5,6,9,7]
         //add more input lists for the corresponding response list in listsOfResponses
     ]
 
