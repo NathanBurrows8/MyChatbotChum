@@ -230,6 +230,13 @@ class Bot(KnowledgeEngine):
                                  int(processUserInput.delayTimeFromUser))
             self.declare(Fact(messageSent="true"))
 
+    @Rule(salience=36)
+    def thanks(self):
+        if "thanks" in self.dictionary:
+            userInterface.send_response(random.choice(jsondata["thanks"]))
+            self.declare(Fact(said="thanks"))
+            self.declare(Fact(messageSent="true"))
+
 
     @Rule(NOT(Fact(messageSent="true")),
           salience=2)

@@ -117,6 +117,9 @@ dottedTimeWithSpaceEveningRegex = [
     {"TEXT": {"REGEX": "^(\d)?(\d)(?![\S])"}},
     {"LOWER": {"REGEX": "p.m."}}
 ]
+thanksRegex = [
+    {"LOWER": {"REGEX": "thanks|thankyou|cheers|ty"}}
+]
 
 #   Regex Notes:
 # currently 23rd jan works but not 23 jan - i think this is fine?
@@ -183,6 +186,7 @@ matcher.add("departBefore", [departBeforeTimeRegex])
 matcher.add("arriveBefore", [arriveBeforeTimeRegex])
 matcher.add("dottedTimeWithSpaceMorning", [dottedTimeWithSpaceMorningRegex])
 matcher.add("dottedTimeWithSpaceEvening", [dottedTimeWithSpaceEveningRegex])
+matcher.add("thanks", [thanksRegex])
 
 
 def labelUserInput(text):
@@ -230,6 +234,8 @@ def labelUserInput(text):
             parseFromAndTo(text)
         elif string_id == "goodbye":
             KEData["goodbye"] = "true"
+        elif string_id == "thanks":
+            KEData["thanks"] = "true"
         elif string_id == "today":
             KEData["today"] = "true"
             date = str(now.day).zfill(2) + str(now.month).zfill(2) + str(now.year)[2:4]
