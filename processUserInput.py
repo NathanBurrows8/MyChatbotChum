@@ -190,7 +190,7 @@ matcher.add("thanks", [thanksRegex])
 
 
 def labelUserInput(text):
-    global websiteDeparture, websiteDestination, isReturn, websiteType, websiteDate, websiteTime, isBooking, websiteReturnType
+    global websiteDeparture, websiteDestination, isReturn, websiteType, websiteDate, websiteTime, isBooking, websiteReturnType, givenTicket
 
     dictionary = {}
     now = datetime.datetime.now()
@@ -215,6 +215,7 @@ def labelUserInput(text):
             KEData["booking"] = "true"
             isBooking = "true"
             parseFromAndTo(text)
+            givenTicket = ""
             if "single" in text:
                 KEData["single"] = "true"
                 isReturn = "false"
@@ -224,6 +225,7 @@ def labelUserInput(text):
         elif string_id == "delay":
             KEData["delay"] = "true"
             isBooking = "false"
+            givenTicket = ""
         elif string_id == "single":
             KEData["single"] = "true"
             parseFromAndTo(text)
@@ -638,6 +640,7 @@ def printStringsDebug():
     print("DELAY_DEPARTURE_TIME", delayDepartureTime)
     print("DELAY_STATION", delayStationUserIsAt)
     print("DELAY_TIME_USER", delayTimeFromUser)
+    print("GIVEN_TICKET", givenTicket)
 
 def setDate(date, KEData):
     #sets the date either as an outbound or inbound journey
@@ -750,7 +753,7 @@ def datetimeToString(date):
 def resetStrings():
     #resets the internal variables to allow for a new conversation
     global websiteDeparture, websiteDestination, websiteDate, websiteTime, websiteType, websiteReturnDate, \
-        websiteReturnTime, websiteReturnType, isBooking, isReturn, isDelay, givenTicket, delayDestinationStation, \
+        websiteReturnTime, websiteReturnType, isBooking, isReturn, isDelay, delayDestinationStation, \
         delayDepartureStation, delayStationUserIsAt, delayTimeFromUser, delayDepartureTime
     isBooking = ""
     isReturn = ""
@@ -763,7 +766,6 @@ def resetStrings():
     websiteReturnDate = ""
     websiteReturnTime = ""
     websiteReturnType = ""
-    givenTicket = ""
     delayStationUserIsAt = ""
     delayTimeFromUser = ""
     delayDestinationStation = ""

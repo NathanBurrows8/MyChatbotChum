@@ -232,7 +232,7 @@ class Bot(KnowledgeEngine):
 
     @Rule(salience=36)
     def thanks(self):
-        if "thanks" in self.dictionary:
+        if "thanks" in self.dictionary and processUserInput.givenTicket == "true":
             userInterface.send_response(random.choice(jsondata["thanks"]))
             self.declare(Fact(said="thanks"))
             self.declare(Fact(messageSent="true"))
