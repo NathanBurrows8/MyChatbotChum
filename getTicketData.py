@@ -87,7 +87,7 @@ def getData(website):
             hasCheapest.append(str(item))
         parseData(hasCheapest, website, price)
     except AttributeError:
-        userInterface.send_response("Sorry, I didnt understand that query! Would you like me to help you make a booking, or find potential delays?")
+        userInterface.send_response("Sorry, I didn't understand that query! Would you like me to help you make a booking, or find potential delays?")
         processUserInput.resetStrings()
 
 

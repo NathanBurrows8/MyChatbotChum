@@ -1,6 +1,6 @@
-#This file is the Knowledge Engine. A dictionary is passed to it from processUserInput, with the text and what
-#labels that text has. Based on those labels, and the rules detailed below, this is the file that determines
-#what robot response should be displayed.
+# This file is the Knowledge Engine. A dictionary is passed to it from processUserInput, with the text and what
+# labels that text has. Based on those labels, and the rules detailed below, this is the file that determines
+# what robot response should be displayed.
 
 
 # the original plan was to use PyKE but this only works on Python 2.x and is deprecated - as this had the most documentation/was most popular
@@ -14,12 +14,24 @@ import predictDelay
 import userInterface
 import processUserInput
 
-with open("./static/intents.json") as json_file:    # this data is intents.json, the robots vocabulary
+with open("./static/intents.json") as json_file:  # this data is intents.json, the robots vocabulary
     jsondata = json.load(json_file)
 
+
 class Bot(KnowledgeEngine):
-# This is the rule based KE. The validation functions have the highest salience, which means they are prioritised
-# and fired first. Each function gives a different robot response based on certain conditions.
+    # This is the rule based KE. The validation functions have the highest salience, which means they are prioritised
+    # and fired first. Each function gives a different robot response based on certain conditions.
+
+    @Rule(salience=60)
+    def attempt_to_book_without_isBooking(self):
+        if processUserInput.isBooking == "":
+            if len(processUserInput.websiteDeparture) > 0 or len(processUserInput.websiteDate) > 0 or \
+                    len(processUserInput.websiteTime):
+                processUserInput.resetStrings()
+                userInterface.send_response(
+                    "Sorry, I didn't understand that query! Would you like me to help you make a booking, or find potential delays?")
+                self.declare(Fact(said="attempt_to_book_without_isBooking"))
+                self.decalre(Fact(messageSent="true"))
 
     @Rule(salience=59)
     def unable_to_parse_time(self):
@@ -34,7 +46,6 @@ class Bot(KnowledgeEngine):
             userInterface.send_response(random.choice(jsondata["validation_no_station_found"]))
             self.declare(Fact(said="no_station_found"))
             self.declare(Fact(messageSent="true"))
-
 
     @Rule(salience=57)
     def duplicate_station_delay(self):
@@ -96,7 +107,6 @@ class Bot(KnowledgeEngine):
                 self.declare(Fact(said="ask_departure_location"))
                 self.declare(Fact(messageSent="true"))
 
-
     @Rule(NOT(Fact(messageSent="true")),
           salience=49)
     def ask_arrival_location(self):
@@ -124,7 +134,6 @@ class Bot(KnowledgeEngine):
                 self.declare(Fact(said="ask_departure_time"))
                 self.declare(Fact(messageSent="true"))
 
-
     @Rule(NOT(Fact(messageSent="true")),
           salience=46)
     def complete_single_ticket(self):
@@ -134,7 +143,8 @@ class Bot(KnowledgeEngine):
                         len(processUserInput.websiteDate) > 0 and len(processUserInput.websiteTime) > 0:
                     if len(processUserInput.websiteType) == 0:
                         processUserInput.websiteType = "dep"
-                    getTicketData.formWebsite(processUserInput.websiteDeparture.strip(), processUserInput.websiteDestination.strip(),
+                    getTicketData.formWebsite(processUserInput.websiteDeparture.strip(),
+                                              processUserInput.websiteDestination.strip(),
                                               processUserInput.websiteDate, processUserInput.websiteTime,
                                               processUserInput.websiteType)
                     self.declare(Fact(messageSent="true"))
@@ -171,7 +181,8 @@ class Bot(KnowledgeEngine):
                     if len(processUserInput.websiteReturnType) == 0:
                         processUserInput.websiteReturnType = "dep"
                     getTicketData.formWebsiteReturn(processUserInput.websiteDeparture.strip(),
-                                                    processUserInput.websiteDestination.strip(), processUserInput.websiteDate,
+                                                    processUserInput.websiteDestination.strip(),
+                                                    processUserInput.websiteDate,
                                                     processUserInput.websiteTime, processUserInput.websiteType,
                                                     processUserInput.websiteReturnDate,
                                                     processUserInput.websiteReturnTime,
@@ -195,8 +206,6 @@ class Bot(KnowledgeEngine):
             userInterface.send_response(random.choice(jsondata["question_destination_station_delay"]))
             self.declare(Fact(messageSent="true"))
             self.declare(Fact(said="ask_destination_station_delay"))
-
-
 
     @Rule(NOT(Fact(messageSent="true")),
           salience=40)
@@ -239,25 +248,17 @@ class Bot(KnowledgeEngine):
             self.declare(Fact(said="thanks"))
             self.declare(Fact(messageSent="true"))
 
-    @Rule(salience=35)
-    def goodbye(self):
-        if "goodbye" in self.dictionary and processUserInput.givenTicket == "true":
-            userInterface.send_response(random.choice(jsondata["goodbye"]))
-            self.declare(Fact(said="goodbye"))
-            self.declare(Fact(messageSent="true"))
-
-
     @Rule(NOT(Fact(messageSent="true")),
           salience=2)
     def panic(self):
-        if len(processUserInput.givenTicket) == 0:
-            userInterface.send_response(random.choice(jsondata["unable_to_parse"]))
-            self.declare(Fact(said="panic"))
-            self.declare(Fact(messageSent="true"))
+        userInterface.send_response(random.choice(jsondata["unable_to_parse"]))
+        self.declare(Fact(said="panic"))
+        self.declare(Fact(messageSent="true"))
+
 
 def finalResponseText(nlp):
-    #This is called from processUserInput. The dictionary is passed to the KE, and the KE is run. This is the last step
-    #before the final response text is sent back to the javascript file to be displayed.
+    # This is called from processUserInput. The dictionary is passed to the KE, and the KE is run. This is the last step
+    # before the final response text is sent back to the javascript file to be displayed.
     bot = Bot()
     bot.dictionary = nlp
     print(nlp)
