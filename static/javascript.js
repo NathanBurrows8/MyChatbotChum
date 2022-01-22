@@ -210,22 +210,45 @@ console.log("myTester called")
         ["Sorry, I can only predict a delay if I am given a valid station! Please specify again."],
         ["Sorry, you cannot choose this station! Please specify again."],
         ["Apologies, I could not quite understand that time! Please state it again."],
-        ["What time did you depart?"]
+        ["What time did you depart?"],
+
+        // Error handling messages
+        ["Sorry, the destination and departure locations cannot be the same!"],
+        // Thrown from getData in getTicketData
+        ["Sorry, I didnt understand that query! Would you like me to help you make a booking, or find potential delays?"],
+        //
+        ["Oops! I couldn't find any results for that journey, please try again." + " I can help you book a train ticket, or predict delays, what would you like me to do?"],
+
+        //predictDelay responses
+        ["Getting train data..."],
+        ["Sorry, I cant find any train IDs for that route. " +
+                                        "Want me to predict another route, or book a train ticket?"],
+        ["Sorry, it doesn't seem like this route was valid. " +
+                                                        "Want me to predict another route, or book a train ticket?"],
+        ["Predicting delay..."],
+        ["Good news! You are still expected to arrive on time. Thanks for using our service."],
+        ["I predict that you will be just 1 minute late to your destination. Thanks for using our service."],
+        //["I predict that you will be " + str(                                                                         //requires explicit final output response
+        //                     prediction) + " minutes late to your destination. Thanks for using our service."]
+        ["Sorry, I can't find the station you're at on this route. Want me to predict another delay, or book a train ticket?"],
+        ["Sorry, I couldn't find any results for this journey. Want me to predict another route, or book a train ticket?"]
+
     ]
 
     // STEP 2: add a new string for that expected final output
     const finalExpectedOutputStringList = [
         "------------------------FOR 22/01/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 08:20, and arrives at Norwich at 09:40.<br>The journey will take 1 hour  and 20 minutes, and has 0 changes.<br>The ticket will cost £20.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/220122/0800/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>",
         "------------------------FOR 23/01/22-----------------------<br> The cheapest journey departs from London Liverpool Street</mark> at 12:18, and arrives at Norwich at 14:55.<br>The journey will take 2 hours  and 37 minutes, and has 2 changes.<br>The ticket will cost £15.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/London/NRW/230122/1200/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(Some or all of this journey is via bus. Check the booking website for details)<br>",
-        "------------------------FOR 28/01/22-----------------------<br> The cheapest journey departs from Northampton</mark> at 12:05, and arrives at London Euston at 13:23.<br>The journey will take 1 hour  and 18 minutes, and has 0 changes.<br>The ticket will cost £11.30.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/northampton/london/280122/1200/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by London Northwestern Railway)<br>"
+        "------------------------FOR 28/01/22-----------------------<br> The cheapest journey departs from Northampton</mark> at 12:05, and arrives at London Euston at 13:23.<br>The journey will take 1 hour  and 18 minutes, and has 0 changes.<br>The ticket will cost £11.30.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/northampton/london/280122/1200/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by London Northwestern Railway)<br>",
+        "------------------------FOR 25/02/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 14:03, and arrives at London Liverpool Street at 15:15.<br>The journey will take 1 hour  and 12 minutes, and has 0 changes.<br>The ticket will cost £8.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/london liverpool street/250222/1600/arr\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details)"
     ]
 
     // STEP 1: Specify input strings inside a new nested list and add expected response types in a comment next to it
     const listsofInputs = [
         ["booking", "single", "cambridge", "norwich", "today", "8:00"],     //expected response type = [4,5,6,9,7]
         ["book", "single", "London", "Norwich", "tomorrow", "noon"],         //expected response type = [4,5,6,9,7]
-        ["book a single ticket", "northampton", "london", "friday#", "12pm"] //expected response type = [5,6,9,7]
-        //add more input lists for the corresponding response list in listsOfResponses
+        ["book a single ticket", "northampton", "london", "friday#", "12pm"], //expected response type = [5,6,9,7]
+        ["hello i would like to book a train ticket", "single please", "cambridge", "london liverpool street", "25th feb", "i want to arrive before 4pm"] //4,5,6,9,7
     ]
 
 
