@@ -90,7 +90,7 @@ class Bot(KnowledgeEngine):
           salience=50)
     def ask_departure_location(self):
         if processUserInput.isBooking == "true":
-            if processUserInput.websiteDeparture == "":
+            if processUserInput.websiteDeparture == "" and len(processUserInput.isReturn) > 0:
                 userInterface.send_response(random.choice(jsondata["question_departure_location"]))
                 self.declare(Fact(said="ask_departure_location"))
                 self.declare(Fact(messageSent="true"))

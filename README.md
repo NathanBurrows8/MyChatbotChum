@@ -51,6 +51,7 @@ CONVERSATION FLOW:
 -"book me a return ticket"
 -"I want a single ticket from northampton to london"
 -"I want a ticket from northampton to london"
+-"Book a single ticket, friday 15:30, from norwich to london" <-- this completes a ticket in 1 line!
 
 -"I want to find delays"
 -"predict delay"
