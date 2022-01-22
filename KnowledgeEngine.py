@@ -229,6 +229,7 @@ class Bot(KnowledgeEngine):
                                  processUserInput.delayDepartureTime, processUserInput.delayStationUserIsAt,
                                  int(processUserInput.delayTimeFromUser))
             self.declare(Fact(messageSent="true"))
+            processUserInput.givenTicket = "true"
 
     @Rule(salience=36)
     def thanks(self):

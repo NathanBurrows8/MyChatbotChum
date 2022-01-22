@@ -497,7 +497,7 @@ def labelUserInput(text):
             setTime("0000")
         elif string_id == "noTimeGiven":
             KEData["noTimeGiven"] = "true"
-            setTime("1000")
+            setTime("2000")
         elif string_id == "arriveBefore":
             KEData["arriveBefore"] = "true"
         elif string_id == "departBefore":
