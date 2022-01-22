@@ -251,10 +251,9 @@ class Bot(KnowledgeEngine):
     @Rule(NOT(Fact(messageSent="true")),
           salience=2)
     def panic(self):
-        if len(processUserInput.givenTicket) == 0:
-            userInterface.send_response(random.choice(jsondata["unable_to_parse"]))
-            self.declare(Fact(said="panic"))
-            self.declare(Fact(messageSent="true"))
+        userInterface.send_response(random.choice(jsondata["unable_to_parse"]))
+        self.declare(Fact(said="panic"))
+        self.declare(Fact(messageSent="true"))
 
 
 def finalResponseText(nlp):
