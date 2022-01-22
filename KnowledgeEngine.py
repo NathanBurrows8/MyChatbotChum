@@ -29,7 +29,7 @@ class Bot(KnowledgeEngine):
                     len(processUserInput.websiteTime):
                 processUserInput.resetStrings()
                 userInterface.send_response(
-                    "Sorry, I didnt understand that query! Would you like me to help you make a booking, or find potential delays?")
+                    "Sorry, I didn't understand that query! Would you like me to help you make a booking, or find potential delays?")
                 self.declare(Fact(said="attempt_to_book_without_isBooking"))
                 self.decalre(Fact(messageSent="true"))
 
