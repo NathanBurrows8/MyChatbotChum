@@ -115,9 +115,8 @@ def predict(departureCode, arrivalCode, departureTime, stationCode, delayInMinut
                             delayAtArrival = int((actualDepTime - expectedDepTime).seconds / 60)    #in minutes
                             inputArray.append([delayAtStation, delayAtArrival])
                         else:
-                            userInterface.send_response("Sorry, it doesn't seem like this route was valid. "
-                                                        "Want me to predict another route, or book a train ticket?")
-                            processUserInput.resetStrings()
+                            stationFound = False
+
 
         if stationFound is False:
             userInterface.send_response("Sorry, I can't find the station you're at on this route. Want me to predict another delay, or book a train ticket?")
