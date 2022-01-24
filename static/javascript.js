@@ -165,11 +165,12 @@ function sendToPythonAndWait(text)
 
 async function testHarness() {
 
-    console.log("myTester called")
+    console.log("testHarness called")
 
     const listsOfResponses = [
         ["Hello there! What assistance do you need?", "Hi there! How can I help?", "Nice to see you! What can I do for you?", "Hello, can i help?", "Hi! Is there anything you would like my help with?"],
         ["Happy to help!", "Happy to be of assistance!", "Glad I could help!", "My pleasure!"],
+        ["Bye! See you again soon!", "Farewell!", "Until next time!"],
         ["Hi! What would you like me to do? I can either help you make a booking, or find potential delays.", "Hi there! Would you like me to help find potential delays, or assist with a booking?"],
         ["I didn't quite understand that. Sorry!", "Oops, I don't quite understand.", "Apologies, but I didn't understand that."],
         ["Will this be a single, or a return ticket?"],
@@ -237,10 +238,10 @@ async function testHarness() {
 
     // STEP 3: Specify the appropriate category of response for each input string (category = the index in listsOfResponses)
     const listsOfExpectedResponseCategories = [
-        [4,5,6,9,7],
-        [4,5,6,9,7],
-        [5,6,9,7],
-        [4,5,6,9,7]
+        [5,6,7,10,8],
+        [5,6,7,10,8],
+        [6,7,10,8],
+        [5,6,7,10,8]
     ]
 
     //function to compare returned category list with expected category list
@@ -264,7 +265,7 @@ async function testHarness() {
                     success = true
                     break;
                 } else {
-                    console.log("\nERROR: Full Test " + list + "." + input + " Failed with User Input:  \"" + listsOfInputs[list][input] + "\" and Bot Final Response: \"" + actualResponse + ".\n\n")
+                    console.log("\nERROR: Full Test " + list + " Failed with User Input:  \"" + listsOfInputs[list][input] + "\" and Bot Final Response: \"" + actualResponse + ".\n\n")
                     break;
                 }
             }
