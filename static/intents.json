@@ -59,7 +59,7 @@
 
 
     "validation_invalid_time": 
-    ["Oops! I didnt quite understand that time. Can you repeat it in a HH:MM format?"],
+    ["Oops! I didnt quite understand that time. Please input it again."],
   
    
     "validation_past_time":

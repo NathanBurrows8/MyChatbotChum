@@ -57,6 +57,7 @@ def getDataFromRID(rid):
 
 def predict(departureCode, arrivalCode, departureTime, stationCode, delayInMinutes):
     global delayAtStation
+    stationFound = False
     #getting an hour window of trains leaving 30mins before - 30mins after given departure time
     hours = int(departureTime[0:2])
     minutes = int(departureTime[2:4])
@@ -77,7 +78,7 @@ def predict(departureCode, arrivalCode, departureTime, stationCode, delayInMinut
         location_list = []  #getting a list of all locations a train goes to during a certain route
         for i in trainDataList:
             location_list.append(i['serviceAttributesDetails']['locations'])
-
+        print(location_list)
         if len(location_list) == 0:
             userInterface.send_response("Sorry, I cant find any train IDs for that route. "
                                         "Want me to predict another route, or book a train ticket?")
@@ -86,6 +87,7 @@ def predict(departureCode, arrivalCode, departureTime, stationCode, delayInMinut
             for i in location_list:
                 for j in i:     #iterating through each location
                     if j['location'] == stationCode:        #if this index is the station the user is at
+                        stationFound = True
                         expectedDep = j['gbtt_ptd']
                         if len(expectedDep) == 0:
                             break
@@ -117,27 +119,30 @@ def predict(departureCode, arrivalCode, departureTime, stationCode, delayInMinut
                                                         "Want me to predict another route, or book a train ticket?")
                             processUserInput.resetStrings()
 
-
-        arr = np.array(inputArray)
-        userInterface.send_response("Predicting delay...")
-        try:
-            nn = MLPRegressor(max_iter=9000).fit(arr[:, :-1], arr[:, -1])   #a multilayer perceptron is the AI model
-            prediction = nn.predict([[delayInMinutes]])[0]
-            print("PREDICTION", prediction)
-            prediction = int(prediction)
-            if prediction < 1:
-                userInterface.send_response(
-                    "Good news! You are still expected to arrive on time. Thanks for using our service.")
-            elif prediction == 1:
-                userInterface.send_response(
-                    "I predict that you will be just 1 minute late to your destination. Thanks for using our service.")
-            else:
-                userInterface.send_response("I predict that you will be " + str(
-                    prediction) + " minutes late to your destination. Thanks for using our service.")
-            processUserInput.resetStrings()
-        except Exception:
+        if stationFound is False:
             userInterface.send_response("Sorry, I can't find the station you're at on this route. Want me to predict another delay, or book a train ticket?")
             processUserInput.resetStrings()
+        else:
+            arr = np.array(inputArray)
+            userInterface.send_response("Predicting delay...")
+            try:
+                nn = MLPRegressor(max_iter=9000).fit(arr[:, :-1], arr[:, -1])   #a multilayer perceptron is the AI model
+                prediction = nn.predict([[delayInMinutes]])[0]
+                print("PREDICTION", prediction)
+                prediction = int(prediction)
+                if prediction < 1:
+                    userInterface.send_response(
+                        "Good news! You are still expected to arrive on time. Thanks for using our service.")
+                elif prediction == 1:
+                    userInterface.send_response(
+                        "I predict that you will be just 1 minute late to your destination. Thanks for using our service.")
+                else:
+                    userInterface.send_response("I predict that you will be " + str(
+                        prediction) + " minutes late to your destination. Thanks for using our service.")
+                processUserInput.resetStrings()
+            except Exception:
+                userInterface.send_response("Sorry, I can't find the station you're at on this route. Want me to predict another delay, or book a train ticket?")
+                processUserInput.resetStrings()
 
     else:
         userInterface.send_response("Sorry, I couldn't find any results for this journey. Want me to predict another route, or book a train ticket?")
