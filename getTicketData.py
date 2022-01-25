@@ -252,8 +252,8 @@ def printReturnTicket(dict1, dict2, dict3, dict4, price, website):
             + str(dict3['arrivalTime']) + ".<br>" + timeString1 + "(Journey provided by " + str(dict4['tocName']) \
             + ")<br>"
 
-    if dict1['statusIcon'] == "AMBER_TRIANGLE":
-        if dict1['statusMessage'] == "bus service":
+    if dict3['statusIcon'] == "AMBER_TRIANGLE":
+        if dict3['statusMessage'] == "bus service":
             ticket = ticket + "(Some or all of this journey is via bus. Check the booking website for details.)<br>"
         else:
             ticket = ticket + "(There may be some disruption on this route. Check the booking website for details.) <br>"
