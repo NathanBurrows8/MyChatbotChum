@@ -306,7 +306,10 @@ def labelUserInput(text):
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
-                    setDate(stringDate, KEData)
+                    if validateDate(stringDate):
+                        setDate(stringDate, KEData)
+                    else:
+                        KEData["invalidDate"] = "true"
             except ValueError:
                 KEData["invalidDate"] = "true"
         elif string_id == "writtenDateShorterMonth":
@@ -318,7 +321,10 @@ def labelUserInput(text):
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
-                    setDate(stringDate, KEData)
+                    if validateDate(stringDate):
+                        setDate(stringDate, KEData)
+                    else:
+                        KEData["invalidDate"] = "true"
             except ValueError:
                 KEData["invalidDate"] = "true"
         elif string_id == "writtenDateOf":
@@ -331,7 +337,10 @@ def labelUserInput(text):
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
-                    setDate(stringDate, KEData)
+                    if validateDate(stringDate):
+                        setDate(stringDate, KEData)
+                    else:
+                        KEData["invalidDate"] = "true"
             except ValueError:
                 KEData["invalidDate"] = "true"
         elif string_id == "writtenDateShorterMonthOf":
@@ -344,7 +353,10 @@ def labelUserInput(text):
                 if isDateTooFarInFuture(stringDate):
                     KEData["dateTooFarInFuture"] = "true"
                 else:
-                    setDate(stringDate, KEData)
+                    if validateDate(stringDate):
+                        setDate(stringDate, KEData)
+                    else:
+                        KEData["invalidDate"] = "true"
             except ValueError:
                 KEData["invalidDate"] = "true"
         elif string_id == "writtenTimeMorning":
