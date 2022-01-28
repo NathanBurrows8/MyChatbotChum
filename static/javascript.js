@@ -101,7 +101,7 @@ function micAnalysis() {
         }
     }
 
-    //testHarness()        //call test harness
+    testHarness()        //call test harness
 }
 
 
@@ -178,7 +178,7 @@ async function testHarness() {
         ["Where would you like to travel to?", "Where will you be travelling to?"],
         ["Please specify a time for this outbound journey."],
         ["And please specify a time for your return journey."],
-        ["What date do you want to depart on?", "What date will you be leaving on?"],
+        ["What date do you want to depart on?", "What date will you be leaving on?"],       //#10
         ["What date would you like to return on?", "Which date will you be coming back on?"],
         ["Sorry! I don't quite understand that date! Please input it again."],
         ["Sorry, that date is in the past! Please request another date.", "I'm afraid that date is in the past, oops! Please specify another date."],
@@ -225,15 +225,52 @@ async function testHarness() {
         ["booking", "single", "cambridge", "norwich", "today", "8:00"],
         ["book", "single", "London", "Norwich", "tomorrow", "noon"],
         ["book a single ticket", "northampton", "london", "friday#", "12pm"],
-        ["hello i would like to book a train ticket", "single please", "cambridge", "london liverpool street", "25th feb", "i want to arrive before 4pm"]
+        ["hello i would like to book a train ticket", "single please", "cambridge", "london liverpool street", "25th feb", "i want to arrive before 4pm"],
+        // testing all different date and time formats //
+        ["booking", "single", "cambridge", "norwich", "monday", "1:45pm"],
+        ["booking", "single", "cambridge", "norwich", "tuesday", "1:45 p.m."],
+        ["booking", "single", "cambridge", "norwich", "23/02/22", "morning"],
+        ["booking", "single", "cambridge", "norwich", "23/02/2022", "noon"],
+        ["booking", "single", "cambridge", "norwich", "23/02", "afternoon"],
+        ["booking", "single", "cambridge", "norwich", "23rd feb", "midnight"],
+        ["booking", "single", "cambridge", "norwich", "23rd february", "whenever"],
+        ["booking", "single", "cambridge", "norwich", "23rd feb 2022", "i want to arrive before 4pm"],
+        ["booking", "single", "cambridge", "norwich", "23rd of february", "i want to leave before 10:45"],
+        ["booking", "single", "cambridge", "norwich", "23rd february 2022", "13:45"],
+        ["booking", "single", "cambridge", "norwich", "23rd of feb", "13:45"],
+        // testing other input formats //
+        ["I want a single train ticket from norwich to london", "23rd of feb", "13:45"],
+        ["single ticket from IPS to LST", "23rd of feb", "13:45"],
+        ["book me a return ticket", "cambridge", "norwich", "23rd of feb", "13:45", "25th of feb", "12:00pm"],
+        //predict delay
+        ["I am delayed", "norwich", "london liverpool street", "ipswich", "10am", "10"]
+
     ]
 
-    // STEP 2: add a new string for that expected final output (all correct as of 23/01/22 - inputs with strings such as "today" will produce different outputs depending on when they are run)
+    // STEP 2: add a new string for that expected final output (all correct as of 28/01/22 - inputs with strings such as "today" will produce different outputs depending on when they are run)
     const finalExpectedOutputStringList = [
-        "------------------------FOR 23/01/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 08:51, and arrives at Norwich at 10:13.<br>The journey will take 1 hour  and 22 minutes, and has 0 changes.<br>The ticket will cost £20.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/230122/0800/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>",
-        "------------------------FOR 24/01/22-----------------------<br> The cheapest journey departs from London Liverpool Street</mark> at 12:30, and arrives at Norwich at 14:20.<br>The journey will take 1 hour  and 50 minutes, and has 0 changes.<br>The ticket will cost £21.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/London/NRW/240122/1200/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>",
-        "------------------------FOR 28/01/22-----------------------<br> The cheapest journey departs from Northampton</mark> at 12:05, and arrives at London Euston at 13:23.<br>The journey will take 1 hour  and 18 minutes, and has 0 changes.<br>The ticket will cost £11.30.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/northampton/london/280122/1200/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by London Northwestern Railway)<br>",
-        "------------------------FOR 25/02/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 14:03, and arrives at London Liverpool Street at 15:15.<br>The journey will take 1 hour  and 12 minutes, and has 0 changes.<br>The ticket will cost £8.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/london liverpool street/250222/1600/arr\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details)"
+        "------------------------FOR 28/01/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 09:00, and arrives at Norwich at 10:14.<br>The journey will take 1 hour  and 14 minutes, and has 1 change.<br>The ticket will cost £20.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/280122/0800/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>",
+        "------------------------FOR 29/01/22-----------------------<br> The cheapest journey departs from London Liverpool Street</mark> at 12:18, and arrives at Norwich at 14:46.<br>The journey will take 2 hours  and 28 minutes, and has 2 changes.<br>The ticket will cost £18.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/London/NRW/290122/1200/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(Some or all of this journey is via bus. Check the booking website for details)<br>",
+        "------------------------FOR 04/02/22-----------------------<br> The cheapest journey departs from Northampton</mark> at 12:05, and arrives at London Euston at 13:23.<br>The journey will take 1 hour  and 18 minutes, and has 0 changes.<br>The ticket will cost £9.50.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/northampton/london/040222/1200/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by London Northwestern Railway)<br>",
+        "------------------------FOR 25/02/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 14:03, and arrives at London Liverpool Street at 15:15.<br>The journey will take 1 hour  and 12 minutes, and has 0 changes.<br>The ticket will cost £8.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/london liverpool street/250222/1600/arr\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details)",
+        // testing all different date and time formats //
+        "------------------------FOR 31/01/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 14:20, and arrives at Norwich at 15:40.<br>The journey will take 1 hour  and 20 minutes, and has 0 changes.<br>The ticket will cost £20.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/310122/1345/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>",
+        "------------------------FOR 01/02/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 14:20, and arrives at Norwich at 15:40.<br>The journey will take 1 hour  and 20 minutes, and has 0 changes.<br>The ticket will cost £20.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/010222/1345/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>",
+        "------------------------FOR 23/02/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 09:00, and arrives at Norwich at 10:14.<br>The journey will take 1 hour  and 14 minutes, and has 1 change.<br>The ticket will cost £20.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/230222/0900/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details)",
+        "------------------------FOR 23/02/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 12:20, and arrives at Norwich at 13:39.<br>The journey will take 1 hour  and 19 minutes, and has 0 changes.<br>The ticket will cost £20.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/230222/1200/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details)",
+        "------------------------FOR 23/02/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 13:20, and arrives at Norwich at 14:42.<br>The journey will take 1 hour  and 22 minutes, and has 0 changes.<br>The ticket will cost £20.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/230222/1300/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details)",
+        "------------------------FOR 23/02/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 06:02, and arrives at Norwich at 07:25.<br>The journey will take 1 hour  and 23 minutes, and has 0 changes.<br>The ticket will cost £29.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/230222/0000/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details)",
+        "------------------------FOR 23/02/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 20:20, and arrives at Norwich at 21:37.<br>The journey will take 1 hour  and 17 minutes, and has 0 changes.<br>The ticket will cost £20.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/230222/2000/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details)",
+        "------------------------FOR 23/02/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 12:20, and arrives at Norwich at 13:39.<br>The journey will take 1 hour  and 19 minutes, and has 0 changes.<br>The ticket will cost £20.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/230222/1600/arr\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details)",
+        "------------------------FOR 23/02/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 06:02, and arrives at Norwich at 07:25.<br>The journey will take 1 hour  and 23 minutes, and has 0 changes.<br>The ticket will cost £29.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/230222/1045/first\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details)",
+        "------------------------FOR 23/02/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 14:20, and arrives at Norwich at 15:40.<br>The journey will take 1 hour  and 20 minutes, and has 0 changes.<br>The ticket will cost £20.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/230222/1345/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details)",
+        "------------------------FOR 23/02/22-----------------------<br> The cheapest journey departs from Cambridge</mark> at 14:20, and arrives at Norwich at 15:40.<br>The journey will take 1 hour  and 20 minutes, and has 0 changes.<br>The ticket will cost £20.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/230222/1345/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details)",
+        // testing other input formats //
+        "------------------------FOR 23/02/22-----------------------<br> The cheapest journey departs from Norwich</mark> at 14:01, and arrives at London Liverpool Street at 15:51.<br>The journey will take 1 hour  and 50 minutes, and has 0 changes.<br>The ticket will cost £10.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/norwich/london/230222/1345/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details)",
+        "------------------------FOR 23/02/22-----------------------<br> The cheapest journey departs from Ipswich</mark> at 13:41, and arrives at London Liverpool Street at 14:51.<br>The journey will take 1 hour  and 10 minutes, and has 0 changes.<br>The ticket will cost £10.00.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/ips/lst/230222/1345/dep\" target=\"_blank\"> click here.</a> <br> (Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details)",
+        "------------------------FOR 23/02/22-----------------------<br> The cheapest outbound journey departs from Cambridge at 14:20, and arrives at Norwich at 15:40.<br> This journey will take 1 hour  and 20 minutes, and has 0 changes.<br>(Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details.) <br>------------------------FOR 25/02/22-----------------------<br> The cheapest inbound journey departs from Norwich at 11:56, and arrives at Cambridge at 13:12.<br>This journey will take 1 hour  and 16 minutes, and has 1 change.<br>(Journey provided by Greater Anglia)<br>(There may be some disruption on this route. Check the booking website for details.) <br><br> This return ticket will cost £26.50.<br> To view your booking, <a href=\"https://ojp.nationalrail.co.uk/service/timesandfares/cambridge/norwich/230222/1345/dep/250222/1200/dep\" target=\"_blank\"> click here.</a> <br> ",
+        //predictdelay
+        "Getting train data...."
     ]
 
     // STEP 3: Specify the appropriate category of response for each input string (category = the index in listsOfResponses)
@@ -241,7 +278,27 @@ async function testHarness() {
         [5,6,7,10,8],
         [5,6,7,10,8],
         [6,7,10,8],
-        [5,6,7,10,8]
+        [5,6,7,10,8],
+        // testing all different date and time formats //
+        [5,6,7,10,8],
+        [5,6,7,10,8],
+        [5,6,7,10,8],
+        [5,6,7,10,8],
+        [5,6,7,10,8],
+        [5,6,7,10,8],
+        [5,6,7,10,8],
+        [5,6,7,10,8],
+        [5,6,7,10,8],
+        [5,6,7,10,8],
+        [5,6,7,10,8],
+        // testing other input formats //
+        [10,9],
+        [10,9],
+        [6,7,10,8,11,9],
+        //error handling
+        [5,6,7,8,8,8],
+        //predictdelay
+        [20,21,22,27,23]
     ]
 
     //function to compare returned category list with expected category list
@@ -259,6 +316,7 @@ async function testHarness() {
 
                     console.log("Intermediate Test " + list + "." + input + " Passed with User Input: \"" + listsOfInputs[list][input] + "\" and Bot Final Response: \"" + actualResponse + ".")
                     const equal = equals(responseTypeList, listsOfExpectedResponseCategories[list])
+
                     if (equal) {
                         console.log("\nFull Test " + list + " Passed with: \nUser Input: \"" + listsOfInputs[list] + "\nResponse Categories: " + responseTypeList + "\nFinal Response: " + actualResponse + ".\n\n")
                     }
